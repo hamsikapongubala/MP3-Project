@@ -1,0 +1,1 @@
+void i2c2__slave_init(i2c_e i2c_number, uint8_t slave_address_to_respond_to);

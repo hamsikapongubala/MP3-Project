@@ -9,6 +9,7 @@
 #include "periodic_scheduler.h"
 #include "queue.h"
 #include "sj2_cli.h"
+#include "uart_lab.h"
 
 static QueueHandle_t song_name_q;
 static QueueHandle_t mp3_data_q;
@@ -34,9 +35,9 @@ void open_mp3_file(char *file_name) {
   FIL file; // File handle
   UINT bytes_written = 0;
   FRESULT result = f_open(&file, file_name, (FA_READ)); // Check what file permissions
-
+  song_data_t buffer = {};                              // init to 0
   if (FR_OK == result) {
-    song_data_t buffer = {}; // init to 0
+
     while (FR_OK == f_read(&file, buffer, strlen(buffer), &bytes_written)) {
       if (xQueueSend(mp3_data_q, buffer, portMAX_DELAY)) {
         ;
@@ -48,7 +49,7 @@ void open_mp3_file(char *file_name) {
     printf("ERROR: Failed to read data to file\n");
     f_close(&file);
   } else {
-    printf("ERROR: Failed to open: %s\n", filename);
+    printf("ERROR: Failed to open: %s\n", buffer);
   }
 }
 
@@ -66,7 +67,7 @@ void mp3_file_reader_task() {
 }
 
 void mp3_file_decoder(song_data_t song_data) {
-  for (int i = 0; i < sizeof(song_data_t); index++) {
+  for (int i = 0; i < sizeof(song_data_t); i++) {
     putchar(song_data[i]);
   }
 }
@@ -91,9 +92,9 @@ int main(void) {
   mp3_data_q = xQueueCreate(2, sizeof(song_data_t));
   song_name_q = xQueueCreate(1, sizeof(song_data_t));
 
-  xTasksCreate(CLI_simulator, "CLI", 1, NULL, PRIORITY_MEDIUM, NULL);
-  xTasksCreate(mp3_file_reader_task, "reader", 1, NULL, PRIORITY_MEDIUM, NULL);
-  xTasksCreate(play_file_task, "player", 1, NULL, PRIORITY_HIGH, NULL);
+  xTaskCreate(CLI_simulator, "CLI", 1024, NULL, PRIORITY_MEDIUM, NULL);
+  xTaskCreate(mp3_file_reader_task, "reader", 1024, NULL, PRIORITY_MEDIUM, NULL);
+  xTaskCreate(play_file_task, "player", 1024, NULL, PRIORITY_HIGH, NULL);
 
   puts("Starting RTOS");
   vTaskStartScheduler(); // This function never returns unless RTOS scheduler runs out of memory and fails

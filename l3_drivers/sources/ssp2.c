@@ -71,7 +71,7 @@ void ssp2__set_max_clock(uint32_t max_clock_khz) {
 }
 
 uint8_t ssp2__exchange_byte(uint8_t byte_to_transmit) {
-  LPC_SSP2->DR = byte_to_transmit;
+  // LPC_SSP2->DR = byte_to_transmit;
 
   while (LPC_SSP2->SR & (1 << 4)) {
     ; // Wait until SSP is busy

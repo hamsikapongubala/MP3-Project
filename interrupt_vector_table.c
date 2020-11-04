@@ -20,11 +20,6 @@ extern void *_estack;
  */
 extern void entry_point(void);
 extern void lpc_peripheral__interrupt_dispatcher(void);
-
-/* KeyWord "extern"--> help complier find function definition */
-/*Replace one of these two function to Code line: 101 (without using API) */
-extern void gpio0__interrupt_dispatcher(void); // Port 0
-extern void gpio2__interrupt_dispatcher(void); // Port 1
 /** @} */
 
 static void halt(void);
@@ -98,7 +93,7 @@ __attribute__((section(".interrupt_vector_table"))) const function__void_f inter
     lpc_peripheral__interrupt_dispatcher, // 51 UART 4
     lpc_peripheral__interrupt_dispatcher, // 52 SSP 2
     lpc_peripheral__interrupt_dispatcher, // 53 LCD
-    lpc_peripheral__interrupt_dispatcher, // lpc_peripheral__interrupt_dispatcher, // 54 GPIO Interrupt
+    lpc_peripheral__interrupt_dispatcher, // 54 GPIO Interrupt
     lpc_peripheral__interrupt_dispatcher, // 55 PWM 0
     lpc_peripheral__interrupt_dispatcher, // 56 EEPROM
 };
