@@ -1,0 +1,10 @@
+import fsops
+
+Import("project_dirnode")
+
+sources = SConscript("#/projects/lpc40xx_freertos/subsidiary_scons")
+sources += fsops.scan_tree(".")
+
+Export("sources")
+
+SConscript("#/projects/lpc40xx_shared_sconscript")

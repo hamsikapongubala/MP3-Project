@@ -1,0 +1,90 @@
+import sys
+
+import env
+from environment_builder import EnvironmentBuilder
+import fsops
+
+"""
+CLI
+"""
+dbc_node_name = GetOption("dbc_node_name")
+no_clang_format = GetOption("no_clang_format")
+no_unit_test = GetOption("no_unit_test")
+test_output = GetOption("test_output")
+timeout = GetOption("timeout")
+verbose = GetOption("verbose")
+
+"""
+Imports
+"""
+Import("project_dirnode")
+Import("sources")
+
+"""
+Define file nodes and directory nodes
+"""
+PROJECT_DIR = project_dirnode
+
+""" Build artifact nodes """
+VARIANT_DIR = Dir("#/_build_{}".format(PROJECT_DIR.name))
+UNIT_TEST_BUILD_DIR = VARIANT_DIR.Dir("test")
+AUTO_GENERATED_CODE_DIR = VARIANT_DIR.Dir("auto_generated")
+MOCK_DIR = project_dirnode.Dir("unittest_header_overrides")
+DBC_DIRS = Dir("#/dbc")
+
+"""
+Import build environment
+"""
+env_arm = env.register_environment("env_arm")
+env_arm.PrintToolchainDescription()
+environment_builder = EnvironmentBuilder(environment=env_arm)
+
+artifacts = environment_builder.build(
+    base_filename=PROJECT_DIR.name,
+    output_dirnode=VARIANT_DIR,
+    sources=sources
+)
+
+"""
+Automatically format all files
+"""
+if not no_clang_format:
+    exclude_file_patterns = [
+        "lpc40xx.h",
+    ]
+
+    exclude_dir_patterns = [
+        "arm-software",
+        "l1_freertos",
+        "fatfs",
+    ]
+
+    format_filenodes, _ = fsops.filter_files(
+        filenodes=sources.formattable_filenodes,
+        exclude_filename_patterns=exclude_file_patterns,
+        exclude_dirname_patterns=exclude_dir_patterns,
+    )
+    for filenode in format_filenodes:
+        env_arm.ClangFormat(filenode=filenode, verbose=verbose)
+
+"""
+Generate code based on discovered DBCs
+"""
+for node in Glob("{}/*.dbc".format(DBC_DIRS.abspath)):
+    env_arm.DatabaseCodeGenerator(source=node, target=AUTO_GENERATED_CODE_DIR, node_name=dbc_node_name)
+
+"""
+Unit test
+"""
+if not no_unit_test:
+    env_x86 = env.register_environment("env_x86")
+    env_x86.Append(CPPPATH=env_arm["CPPPATH"])
+    unit_test_results = env_x86.Test(
+        source=sources.unit_test_filenodes,
+        target=UNIT_TEST_BUILD_DIR,
+        sources=sources,
+        summary_only=not test_output,
+        timeout=timeout,
+        verbose=verbose,
+    )
+    Requires(artifacts.object_filenodes, unit_test_results)
