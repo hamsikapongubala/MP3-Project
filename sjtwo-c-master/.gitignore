@@ -1,5 +1,0 @@
-**/*.pyc
-**/.DS_Store
-.sconsign.dblite
-_build_*/*
-_build_*
