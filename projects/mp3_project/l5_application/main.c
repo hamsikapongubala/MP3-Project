@@ -18,52 +18,30 @@ static QueueHandle_t mp3_data_q;
 typedef char song_data_t[512];
 typedef char song_name_t[32];
 
-// CLI sends the song name
-void CLI_simulator() {
-  song_name_t song = {};
-  strncpy(song, "name.txt", sizeof(song) - 1);
-  if (xQueueSend(song_name_q, song, 0)) { // with &?
-    puts("Sent songname\n");
-  } else {
-    puts("Couldn't send songname to queue\n");
-  }
-  vTaskSuspend(NULL);
-}
-
-// open file
-void open_mp3_file(char *file_name) {
-  // const char *filename = "file.txt";
-  FIL file; // File handle
-  UINT bytes_written = 0;
-  FRESULT result =
-      f_open(&file, file_name, (FA_READ)); // Check what file permissions
-  song_data_t buffer = {};                 // init to 0
-  if (FR_OK == result) {
-
-    while (FR_OK == f_read(&file, buffer, strlen(buffer), &bytes_written)) {
-      if (xQueueSend(mp3_data_q, buffer, portMAX_DELAY)) {
-        ;
-      } else {
-        puts("mp3_data_q send error\n");
-      }
-      memset(&buffer[0], 0, sizeof(buffer));
-    }
-    printf("ERROR: Failed to read data to file\n");
-    f_close(&file);
-  } else {
-    printf("ERROR: Failed to open: %s\n", buffer);
-  }
-}
-
-// reads mp3 file and receives song name from CLI
-void mp3_file_reader_task() {
-  song_name_t song_name = {};
+void mp3_reader_task() {
+  song_name_t file_name = {};
+  song_data_t buffer = {};
+  FIL file;
+  UINT bytes_written;
 
   while (1) {
-    if (xQueueReceive(song_name_q, song_name, 5000)) {
-      open_mp3_file(song_name);
-    } else {
-      puts("song_name_q receive error\n");
+
+    xQueueReceive(song_name_q, &file_name[0], portMAX_DELAY);
+    printf("Received song to play: %s\n", file_name);
+
+    FRESULT result = f_open(&file, file_name, (FA_READ));
+
+    if (FR_OK == result) {
+
+      f_read(&file, buffer, sizeof(buffer), &bytes_written);
+
+      while (bytes_written != 0) {
+        f_read(&file, buffer, sizeof(buffer), &bytes_written);
+        xQueueSend(mp3_data_q, &buffer[0], portMAX_DELAY);
+        memset(&buffer[0], 0, sizeof(buffer));
+      }
+
+      f_close(&file);
     }
   }
 }
@@ -74,7 +52,6 @@ void mp3_file_decoder(song_data_t song_data) {
   }
 }
 
-// plays file
 void play_file_task() {
   song_data_t song_data = {};
   while (1) {
@@ -117,10 +94,8 @@ int main(void) {
   mp3_data_q = xQueueCreate(2, sizeof(song_data_t));
   song_name_q = xQueueCreate(1, sizeof(song_data_t));
 
-  xTaskCreate(CLI_simulator, "CLI", 1024, NULL, PRIORITY_MEDIUM, NULL);
-  xTaskCreate(mp3_file_reader_task, "reader", 1024, NULL, PRIORITY_MEDIUM,
-              NULL);
-  xTaskCreate(play_file_task, "player", 1024, NULL, PRIORITY_HIGH, NULL);
+  xTaskCreate(mp3_reader_task, "reader", 4096, NULL, PRIORITY_MEDIUM, NULL);
+  xTaskCreate(play_file_task, "player", 4096, NULL, PRIORITY_HIGH, NULL);
 
   puts("Starting RTOS");
   vTaskStartScheduler(); // This function never returns unless RTOS scheduler

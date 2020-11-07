@@ -44,7 +44,7 @@ void sj2_cli__init(void) {
       .command_name = "taskcontrol",
       .help_message_for_command = "Suspend or resume a task by name. \n",
       .app_cli_handler = cli__task_control};
-  static app_cli__command_s mp3_play = {.command_name = "mp3_play",
+  static app_cli__command_s mp3_play = {.command_name = "mp3",
                                         .help_message_for_command =
                                             "Type file name to play song\n",
                                         .app_cli_handler = cli__mp3_play};
