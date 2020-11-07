@@ -18,30 +18,28 @@ static QueueHandle_t mp3_data_q;
 typedef char song_data_t[512];
 typedef char song_name_t[32];
 
+// reads mp3 file and receives song name from CLI
 void mp3_reader_task() {
-  song_name_t file_name = {};
+  song_name_t song_name = {};
   song_data_t buffer = {};
   FIL file;
   UINT bytes_written;
 
   while (1) {
-
-    xQueueReceive(song_name_q, &file_name[0], portMAX_DELAY);
-    printf("Received song to play: %s\n", file_name);
-
-    FRESULT result = f_open(&file, file_name, (FA_READ));
-
+    xQueueReceive(song_name_q, song_name, portMAX_DELAY);
+    FRESULT result = f_open(&file, song_name, (FA_READ));
     if (FR_OK == result) {
 
       f_read(&file, buffer, sizeof(buffer), &bytes_written);
 
       while (bytes_written != 0) {
         f_read(&file, buffer, sizeof(buffer), &bytes_written);
-        xQueueSend(mp3_data_q, &buffer[0], portMAX_DELAY);
+        xQueueSend(mp3_data_q, buffer, portMAX_DELAY);
         memset(&buffer[0], 0, sizeof(buffer));
       }
-
       f_close(&file);
+    } else {
+      printf("ERROR: Failed to open: %s\n", buffer);
     }
   }
 }

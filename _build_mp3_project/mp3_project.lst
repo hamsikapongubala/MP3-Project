@@ -23,18 +23,18 @@ Idx Name             Size      VMA       LMA       File off  Algn  Flags
   2 .data            00000330  10000000  0000b6d4  00020000  2**2  CONTENTS, ALLOC, LOAD, DATA
   3 .bss             00000858  10000330  0000ba04  00020330  2**3  ALLOC
   4 .persistent_ram2 00000028  20000000  20000000  00030000  2**2  ALLOC
-  5 .debug_info      0001f04e  00000000  00000000  00020330  2**0  CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev    00005754  00000000  00000000  0003f37e  2**0  CONTENTS, READONLY, DEBUGGING
-  7 .debug_aranges   00000cd8  00000000  00000000  00044ad2  2**0  CONTENTS, READONLY, DEBUGGING
-  8 .debug_ranges    00001658  00000000  00000000  000457aa  2**0  CONTENTS, READONLY, DEBUGGING
-  9 .debug_line      00010756  00000000  00000000  00046e02  2**0  CONTENTS, READONLY, DEBUGGING
- 10 .debug_str       0000585e  00000000  00000000  00057558  2**0  CONTENTS, READONLY, DEBUGGING
- 11 .comment         00000076  00000000  00000000  0005cdb6  2**0  CONTENTS, READONLY
- 12 .ARM.attributes  00000032  00000000  00000000  0005ce2c  2**0  CONTENTS, READONLY
- 13 .debug_frame     000038a0  00000000  00000000  0005ce60  2**2  CONTENTS, READONLY, DEBUGGING
- 14 .debug_loc       0000f8e3  00000000  00000000  00060700  2**0  CONTENTS, READONLY, DEBUGGING
- 15 .stab            00000054  00000000  00000000  0006ffe4  2**2  CONTENTS, READONLY, DEBUGGING
- 16 .stabstr         000000ab  00000000  00000000  00070038  2**0  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info      0001f051  00000000  00000000  00020330  2**0  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev    00005754  00000000  00000000  0003f381  2**0  CONTENTS, READONLY, DEBUGGING
+  7 .debug_aranges   00000cd8  00000000  00000000  00044ad5  2**0  CONTENTS, READONLY, DEBUGGING
+  8 .debug_ranges    00001658  00000000  00000000  000457ad  2**0  CONTENTS, READONLY, DEBUGGING
+  9 .debug_line      00010756  00000000  00000000  00046e05  2**0  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str       0000585e  00000000  00000000  0005755b  2**0  CONTENTS, READONLY, DEBUGGING
+ 11 .comment         00000076  00000000  00000000  0005cdb9  2**0  CONTENTS, READONLY
+ 12 .ARM.attributes  00000032  00000000  00000000  0005ce2f  2**0  CONTENTS, READONLY
+ 13 .debug_frame     000038a0  00000000  00000000  0005ce64  2**2  CONTENTS, READONLY, DEBUGGING
+ 14 .debug_loc       0000f8f0  00000000  00000000  00060704  2**0  CONTENTS, READONLY, DEBUGGING
+ 15 .stab            00000054  00000000  00000000  0006fff4  2**2  CONTENTS, READONLY, DEBUGGING
+ 16 .stabstr         000000ab  00000000  00000000  00070048  2**0  CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 00000000 l    d  .text	00000000 .text
 0000b6cc l    d  .ARM.exidx	00000000 .ARM.exidx
@@ -8404,22 +8404,22 @@ void uart_puts__polled(uart_e uart, const char *message) {
 
 00002460 <mp3_reader_task>:
 mp3_reader_task():
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:21
-static QueueHandle_t mp3_data_q;
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:22
 
 typedef char song_data_t[512];
 typedef char song_name_t[32];
 
+// reads mp3 file and receives song name from CLI
 void mp3_reader_task() {
-    2460:	b570      	push	{r4, r5, r6, lr}
-    2462:	f5ad 6d8a 	sub.w	sp, sp, #1104	; 0x450
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:22
-  song_name_t file_name = {};
+    2460:	b530      	push	{r4, r5, lr}
+    2462:	f2ad 4d54 	subw	sp, sp, #1108	; 0x454
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:23
+  song_name_t song_name = {};
     2466:	2220      	movs	r2, #32
     2468:	2100      	movs	r1, #0
     246a:	a802      	add	r0, sp, #8
     246c:	f002 fdb8 	bl	4fe0 <memset>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:23
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:24
   song_data_t buffer = {};
     2470:	f44f 7200 	mov.w	r2, #512	; 0x200
     2474:	2100      	movs	r1, #0
@@ -8430,88 +8430,85 @@ void mp3_reader_task() {
   UINT bytes_written;
 
   while (1) {
-
-    xQueueReceive(song_name_q, &file_name[0], portMAX_DELAY);
+    xQueueReceive(song_name_q, song_name, portMAX_DELAY);
     247c:	4c1a      	ldr	r4, [pc, #104]	; (24e8 <mp3_reader_task+0x88>)
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:40
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:37
 
       f_read(&file, buffer, sizeof(buffer), &bytes_written);
 
       while (bytes_written != 0) {
         f_read(&file, buffer, sizeof(buffer), &bytes_written);
-        xQueueSend(mp3_data_q, &buffer[0], portMAX_DELAY);
+        xQueueSend(mp3_data_q, buffer, portMAX_DELAY);
     247e:	4d1b      	ldr	r5, [pc, #108]	; (24ec <mp3_reader_task+0x8c>)
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:30
-    printf("Received song to play: %s\n", file_name);
-    2480:	4e1b      	ldr	r6, [pc, #108]	; (24f0 <mp3_reader_task+0x90>)
 /Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:29
-    xQueueReceive(song_name_q, &file_name[0], portMAX_DELAY);
-    2482:	6820      	ldr	r0, [r4, #0]
-    2484:	f04f 32ff 	mov.w	r2, #4294967295	; 0xffffffff
-    2488:	a902      	add	r1, sp, #8
-    248a:	f000 fdc3 	bl	3014 <xQueueReceive>
+    xQueueReceive(song_name_q, song_name, portMAX_DELAY);
+    2480:	6820      	ldr	r0, [r4, #0]
+    2482:	f04f 32ff 	mov.w	r2, #4294967295	; 0xffffffff
+    2486:	a902      	add	r1, sp, #8
+    2488:	f000 fdc4 	bl	3014 <xQueueReceive>
 /Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:30
-    printf("Received song to play: %s\n", file_name);
+    FRESULT result = f_open(&file, song_name, (FA_READ));
+    248c:	2201      	movs	r2, #1
     248e:	a902      	add	r1, sp, #8
-    2490:	4630      	mov	r0, r6
-    2492:	f003 fdcb 	bl	602c <iprintf>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:32
-    FRESULT result = f_open(&file, file_name, (FA_READ));
-    2496:	2201      	movs	r2, #1
-    2498:	a902      	add	r1, sp, #8
-    249a:	a88a      	add	r0, sp, #552	; 0x228
-    249c:	f7ff f842 	bl	1524 <f_open>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:34
+    2490:	a88a      	add	r0, sp, #552	; 0x228
+    2492:	f7ff f847 	bl	1524 <f_open>
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:31
     if (FR_OK == result) {
-    24a0:	2800      	cmp	r0, #0
-    24a2:	d1ee      	bne.n	2482 <mp3_reader_task+0x22>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:36
+    2496:	bb08      	cbnz	r0, 24dc <mp3_reader_task+0x7c>
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:33
       f_read(&file, buffer, sizeof(buffer), &bytes_written);
-    24a4:	ab01      	add	r3, sp, #4
-    24a6:	f44f 7200 	mov.w	r2, #512	; 0x200
-    24aa:	a90a      	add	r1, sp, #40	; 0x28
-    24ac:	a88a      	add	r0, sp, #552	; 0x228
-    24ae:	f7ff f91f 	bl	16f0 <f_read>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:38
+    2498:	ab01      	add	r3, sp, #4
+    249a:	f44f 7200 	mov.w	r2, #512	; 0x200
+    249e:	a90a      	add	r1, sp, #40	; 0x28
+    24a0:	a88a      	add	r0, sp, #552	; 0x228
+    24a2:	f7ff f925 	bl	16f0 <f_read>
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:35
       while (bytes_written != 0) {
-    24b2:	9b01      	ldr	r3, [sp, #4]
-    24b4:	b91b      	cbnz	r3, 24be <mp3_reader_task+0x5e>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:44
+    24a6:	9b01      	ldr	r3, [sp, #4]
+    24a8:	b91b      	cbnz	r3, 24b2 <mp3_reader_task+0x52>
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:40
         memset(&buffer[0], 0, sizeof(buffer));
       }
-
       f_close(&file);
-    24b6:	a88a      	add	r0, sp, #552	; 0x228
-    24b8:	f7ff fa29 	bl	190e <f_close>
-    24bc:	e7e0      	b.n	2480 <mp3_reader_task+0x20>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:39
+    24aa:	a88a      	add	r0, sp, #552	; 0x228
+    24ac:	f7ff fa2f 	bl	190e <f_close>
+    24b0:	e7e6      	b.n	2480 <mp3_reader_task+0x20>
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:36
         f_read(&file, buffer, sizeof(buffer), &bytes_written);
-    24be:	ab01      	add	r3, sp, #4
+    24b2:	ab01      	add	r3, sp, #4
+    24b4:	a90a      	add	r1, sp, #40	; 0x28
+    24b6:	f44f 7200 	mov.w	r2, #512	; 0x200
+    24ba:	a88a      	add	r0, sp, #552	; 0x228
+    24bc:	f7ff f918 	bl	16f0 <f_read>
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:37
+        xQueueSend(mp3_data_q, buffer, portMAX_DELAY);
     24c0:	a90a      	add	r1, sp, #40	; 0x28
-    24c2:	f44f 7200 	mov.w	r2, #512	; 0x200
-    24c6:	a88a      	add	r0, sp, #552	; 0x228
-    24c8:	f7ff f912 	bl	16f0 <f_read>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:40
-        xQueueSend(mp3_data_q, &buffer[0], portMAX_DELAY);
-    24cc:	a90a      	add	r1, sp, #40	; 0x28
-    24ce:	2300      	movs	r3, #0
-    24d0:	f04f 32ff 	mov.w	r2, #4294967295	; 0xffffffff
-    24d4:	6828      	ldr	r0, [r5, #0]
-    24d6:	f000 fc17 	bl	2d08 <xQueueGenericSend>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:41
+    24c2:	2300      	movs	r3, #0
+    24c4:	f04f 32ff 	mov.w	r2, #4294967295	; 0xffffffff
+    24c8:	6828      	ldr	r0, [r5, #0]
+    24ca:	f000 fc1d 	bl	2d08 <xQueueGenericSend>
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:38
         memset(&buffer[0], 0, sizeof(buffer));
-    24da:	f44f 7200 	mov.w	r2, #512	; 0x200
-    24de:	2100      	movs	r1, #0
-    24e0:	a80a      	add	r0, sp, #40	; 0x28
-    24e2:	f002 fd7d 	bl	4fe0 <memset>
-    24e6:	e7e4      	b.n	24b2 <mp3_reader_task+0x52>
+    24ce:	f44f 7200 	mov.w	r2, #512	; 0x200
+    24d2:	2100      	movs	r1, #0
+    24d4:	a80a      	add	r0, sp, #40	; 0x28
+    24d6:	f002 fd83 	bl	4fe0 <memset>
+    24da:	e7e4      	b.n	24a6 <mp3_reader_task+0x46>
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:42
+    } else {
+      printf("ERROR: Failed to open: %s\n", buffer);
+    24dc:	a90a      	add	r1, sp, #40	; 0x28
+    24de:	4804      	ldr	r0, [pc, #16]	; (24f0 <mp3_reader_task+0x90>)
+    24e0:	f003 fda4 	bl	602c <iprintf>
+    24e4:	e7cc      	b.n	2480 <mp3_reader_task+0x20>
+    24e6:	bf00      	nop
     24e8:	1000070c 	.word	0x1000070c
     24ec:	10000708 	.word	0x10000708
     24f0:	0000aad9 	.word	0x0000aad9
 
 000024f4 <mp3_file_decoder>:
 mp3_file_decoder():
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:49
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:47
     }
   }
 }
@@ -8520,16 +8517,16 @@ void mp3_file_decoder(song_data_t song_data) {
     24f4:	b538      	push	{r3, r4, r5, lr}
     24f6:	1e45      	subs	r5, r0, #1
     24f8:	f200 14ff 	addw	r4, r0, #511	; 0x1ff
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:50 (discriminator 1)
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:48 (discriminator 1)
   for (int i = 0; i < sizeof(song_data_t); i++) {
     24fc:	42a5      	cmp	r5, r4
     24fe:	d100      	bne.n	2502 <mp3_file_decoder+0xe>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:53
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:51
     putchar(song_data[i]);
   }
 }
     2500:	bd38      	pop	{r3, r4, r5, pc}
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:51 (discriminator 3)
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:49 (discriminator 3)
     putchar(song_data[i]);
     2502:	f815 0f01 	ldrb.w	r0, [r5, #1]!
     2506:	f003 fdf1 	bl	60ec <putchar>
@@ -8537,44 +8534,44 @@ void mp3_file_decoder(song_data_t song_data) {
 
 0000250c <play_file_task>:
 play_file_task():
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:55
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:53
 
 void play_file_task() {
     250c:	b500      	push	{lr}
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:59
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:57
   song_data_t song_data = {};
   while (1) {
     memset(&song_data[0], 0, sizeof(song_data_t));
     if (xQueueReceive(mp3_data_q, &song_data[0], portMAX_DELAY)) {
     250e:	4d0c      	ldr	r5, [pc, #48]	; (2540 <play_file_task+0x34>)
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:63
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:61
       // play pause function
       mp3_file_decoder(song_data);
     } else {
       puts("mp3_data_q receive error\n");
     2510:	4c0c      	ldr	r4, [pc, #48]	; (2544 <play_file_task+0x38>)
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:55
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:53
 void play_file_task() {
     2512:	f5ad 7d01 	sub.w	sp, sp, #516	; 0x204
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:58
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:56
     memset(&song_data[0], 0, sizeof(song_data_t));
     2516:	f44f 7200 	mov.w	r2, #512	; 0x200
     251a:	2100      	movs	r1, #0
     251c:	4668      	mov	r0, sp
     251e:	f002 fd5f 	bl	4fe0 <memset>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:59
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:57
     if (xQueueReceive(mp3_data_q, &song_data[0], portMAX_DELAY)) {
     2522:	f04f 32ff 	mov.w	r2, #4294967295	; 0xffffffff
     2526:	4669      	mov	r1, sp
     2528:	6828      	ldr	r0, [r5, #0]
     252a:	f000 fd73 	bl	3014 <xQueueReceive>
     252e:	b118      	cbz	r0, 2538 <play_file_task+0x2c>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:61
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:59
       mp3_file_decoder(song_data);
     2530:	4668      	mov	r0, sp
     2532:	f7ff ffdf 	bl	24f4 <mp3_file_decoder>
     2536:	e7ee      	b.n	2516 <play_file_task+0xa>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:63
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:61
       puts("mp3_data_q receive error\n");
     2538:	4620      	mov	r0, r4
     253a:	f003 fe59 	bl	61f0 <puts>
@@ -8584,7 +8581,7 @@ void play_file_task() {
 
 00002548 <main>:
 main():
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:92
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:90
   }
   return APP_CLI_STATUS__SUCCESS;
 }
@@ -8592,10 +8589,10 @@ main():
 int main(void) {
   setvbuf(stdout, 0, _IONBF, 0);
     2548:	4b1a      	ldr	r3, [pc, #104]	; (25b4 <main+0x6c>)
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:91
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:89
 int main(void) {
     254a:	b513      	push	{r0, r1, r4, lr}
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:92
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:90
   setvbuf(stdout, 0, _IONBF, 0);
     254c:	6818      	ldr	r0, [r3, #0]
     254e:	2300      	movs	r3, #0
@@ -8603,7 +8600,7 @@ int main(void) {
     2552:	2202      	movs	r2, #2
     2554:	6880      	ldr	r0, [r0, #8]
     2556:	f003 fe63 	bl	6220 <setvbuf>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:94
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:92
 
   mp3_data_q = xQueueCreate(2, sizeof(song_data_t));
     255a:	2200      	movs	r2, #0
@@ -8611,26 +8608,26 @@ int main(void) {
     2560:	2002      	movs	r0, #2
     2562:	f000 fbab 	bl	2cbc <xQueueGenericCreate>
     2566:	4b14      	ldr	r3, [pc, #80]	; (25b8 <main+0x70>)
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:95
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:93
   song_name_q = xQueueCreate(1, sizeof(song_data_t));
     2568:	2200      	movs	r2, #0
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:94
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:92
   mp3_data_q = xQueueCreate(2, sizeof(song_data_t));
     256a:	6018      	str	r0, [r3, #0]
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:95
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:93
   song_name_q = xQueueCreate(1, sizeof(song_data_t));
     256c:	f44f 7100 	mov.w	r1, #512	; 0x200
     2570:	2001      	movs	r0, #1
     2572:	f000 fba3 	bl	2cbc <xQueueGenericCreate>
     2576:	4b11      	ldr	r3, [pc, #68]	; (25bc <main+0x74>)
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:97
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:95
 
   xTaskCreate(mp3_reader_task, "reader", 4096, NULL, PRIORITY_MEDIUM, NULL);
     2578:	4911      	ldr	r1, [pc, #68]	; (25c0 <main+0x78>)
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:95
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:93
   song_name_q = xQueueCreate(1, sizeof(song_data_t));
     257a:	6018      	str	r0, [r3, #0]
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:97
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:95
   xTaskCreate(mp3_reader_task, "reader", 4096, NULL, PRIORITY_MEDIUM, NULL);
     257c:	2400      	movs	r4, #0
     257e:	2302      	movs	r3, #2
@@ -8639,7 +8636,7 @@ int main(void) {
     2588:	4623      	mov	r3, r4
     258a:	480e      	ldr	r0, [pc, #56]	; (25c4 <main+0x7c>)
     258c:	f001 f868 	bl	3660 <xTaskCreate>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:98
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:96
   xTaskCreate(play_file_task, "player", 4096, NULL, PRIORITY_HIGH, NULL);
     2590:	2303      	movs	r3, #3
     2592:	f44f 5280 	mov.w	r2, #4096	; 0x1000
@@ -8649,15 +8646,15 @@ int main(void) {
     259c:	4623      	mov	r3, r4
     259e:	480b      	ldr	r0, [pc, #44]	; (25cc <main+0x84>)
     25a0:	f001 f85e 	bl	3660 <xTaskCreate>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:100
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:98
 
   puts("Starting RTOS");
     25a4:	480a      	ldr	r0, [pc, #40]	; (25d0 <main+0x88>)
     25a6:	f003 fe23 	bl	61f0 <puts>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:101
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:99
   vTaskStartScheduler(); // This function never returns unless RTOS scheduler
     25aa:	f001 f887 	bl	36bc <vTaskStartScheduler>
-/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:105
+/Users/hamsikapongubala/Desktop/MP3-Project/projects/mp3_project/l5_application/main.c:103
                          // runs out of memory and fails
 
   return 0;
@@ -25595,8 +25592,8 @@ _lseek():
     aa9f:	74656420 65746365 74612064 64646120      detected at add
     aaaf:	73736572 7830203a 58323025 6572000a     ress: 0x%02X..re
     aabf:	72656461 616c7000 00726579 72617453     ader.player.Star
-    aacf:	676e6974 4f545220 65520053 76696563     ting RTOS.Receiv
-    aadf:	73206465 20676e6f 70206f74 3a79616c     ed song to play:
+    aacf:	676e6974 4f545220 52450053 3a524f52     ting RTOS.ERROR:
+    aadf:	69614620 2064656c 6f206f74 3a6e6570      Failed to open:
     aaef:	0a732520 33706d00 7461645f 20715f61      %s..mp3_data_q 
     aaff:	65636572 20657669 6f727265 46000a72     receive error..F
     ab0f:	52656572 20534f54 45535341 29285452     reeRTOS ASSERT()

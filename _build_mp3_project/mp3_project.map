@@ -1221,6 +1221,14 @@ Discarded input sections
  .text          0x0000000000000000        0x0 _build_mp3_project/obj/lpc_peripherals.o
  .data          0x0000000000000000        0x0 _build_mp3_project/obj/lpc_peripherals.o
  .bss           0x0000000000000000        0x0 _build_mp3_project/obj/lpc_peripherals.o
+ .text          0x0000000000000000        0x0 _build_mp3_project/obj/mp3_decoder.o
+ .data          0x0000000000000000        0x0 _build_mp3_project/obj/mp3_decoder.o
+ .bss           0x0000000000000000        0x0 _build_mp3_project/obj/mp3_decoder.o
+ .debug_line    0x0000000000000000        0x0 _build_mp3_project/obj/mp3_decoder.o
+ .debug_str     0x0000000000000000      0x137 _build_mp3_project/obj/mp3_decoder.o
+ .comment       0x0000000000000000       0x77 _build_mp3_project/obj/mp3_decoder.o
+ .ARM.attributes
+                0x0000000000000000       0x39 _build_mp3_project/obj/mp3_decoder.o
  .text          0x0000000000000000        0x0 _build_mp3_project/obj/pwm1.o
  .data          0x0000000000000000        0x0 _build_mp3_project/obj/pwm1.o
  .bss           0x0000000000000000        0x0 _build_mp3_project/obj/pwm1.o
@@ -1847,6 +1855,7 @@ LOAD _build_mp3_project/obj/hw_timer.o
 LOAD _build_mp3_project/obj/i2c.o
 LOAD _build_mp3_project/obj/i2c_slave_init.o
 LOAD _build_mp3_project/obj/lpc_peripherals.o
+LOAD _build_mp3_project/obj/mp3_decoder.o
 LOAD _build_mp3_project/obj/pwm1.o
 LOAD _build_mp3_project/obj/ssp2.o
 LOAD _build_mp3_project/obj/ssp2_lab.o
@@ -3225,7 +3234,7 @@ END GROUP
                 0x0000000010000000                PROVIDE (_bdata_vma = ADDR (.data))
 OUTPUT(_build_mp3_project/mp3_project.elf elf32-littlearm)
 
-.debug_info     0x0000000000000000    0x1f04e
+.debug_info     0x0000000000000000    0x1f051
  .debug_info    0x0000000000000000      0xb13 _build_mp3_project/obj/entry_point.o
  .debug_info    0x0000000000000b13      0xd91 _build_mp3_project/obj/interrupt_vector_table.o
  .debug_info    0x00000000000018a4      0x454 _build_mp3_project/obj/clock.o
@@ -3246,22 +3255,22 @@ OUTPUT(_build_mp3_project/mp3_project.elf elf32-littlearm)
  .debug_info    0x000000000000cd47      0x37d _build_mp3_project/obj/ssp2_mutex.o
  .debug_info    0x000000000000d0c4      0x337 _build_mp3_project/obj/sys_time.o
  .debug_info    0x000000000000d3fb      0xd1d _build_mp3_project/obj/uart_printf.o
- .debug_info    0x000000000000e118     0x12f7 _build_mp3_project/obj/main.o
- .debug_info    0x000000000000f40f      0x896 _build_mp3_project/obj/rtos_hooks.o
- .debug_info    0x000000000000fca5      0x128 _build_mp3_project/obj/freertos_interrupt_handlers.o
- .debug_info    0x000000000000fdcd      0x5f1 _build_mp3_project/obj/port.o
- .debug_info    0x00000000000103be      0xa5a _build_mp3_project/obj/heap_3.o
- .debug_info    0x0000000000010e18      0xb9c _build_mp3_project/obj/list.o
- .debug_info    0x00000000000119b4     0x2ead _build_mp3_project/obj/queue.o
- .debug_info    0x0000000000014861     0x3cce _build_mp3_project/obj/tasks.o
- .debug_info    0x000000000001852f      0x646 _build_mp3_project/obj/board_io.o
- .debug_info    0x0000000000018b75     0x1289 _build_mp3_project/obj/gpio.o
- .debug_info    0x0000000000019dfe      0x538 _build_mp3_project/obj/hw_timer.o
- .debug_info    0x000000000001a336     0x1ea4 _build_mp3_project/obj/i2c.o
- .debug_info    0x000000000001c1da      0x2d7 _build_mp3_project/obj/i2c_slave_init.o
- .debug_info    0x000000000001c4b1      0x978 _build_mp3_project/obj/lpc_peripherals.o
- .debug_info    0x000000000001ce29      0xf3e _build_mp3_project/obj/ssp2.o
- .debug_info    0x000000000001dd67     0x12e7 _build_mp3_project/obj/uart.o
+ .debug_info    0x000000000000e118     0x12fa _build_mp3_project/obj/main.o
+ .debug_info    0x000000000000f412      0x896 _build_mp3_project/obj/rtos_hooks.o
+ .debug_info    0x000000000000fca8      0x128 _build_mp3_project/obj/freertos_interrupt_handlers.o
+ .debug_info    0x000000000000fdd0      0x5f1 _build_mp3_project/obj/port.o
+ .debug_info    0x00000000000103c1      0xa5a _build_mp3_project/obj/heap_3.o
+ .debug_info    0x0000000000010e1b      0xb9c _build_mp3_project/obj/list.o
+ .debug_info    0x00000000000119b7     0x2ead _build_mp3_project/obj/queue.o
+ .debug_info    0x0000000000014864     0x3cce _build_mp3_project/obj/tasks.o
+ .debug_info    0x0000000000018532      0x646 _build_mp3_project/obj/board_io.o
+ .debug_info    0x0000000000018b78     0x1289 _build_mp3_project/obj/gpio.o
+ .debug_info    0x0000000000019e01      0x538 _build_mp3_project/obj/hw_timer.o
+ .debug_info    0x000000000001a339     0x1ea4 _build_mp3_project/obj/i2c.o
+ .debug_info    0x000000000001c1dd      0x2d7 _build_mp3_project/obj/i2c_slave_init.o
+ .debug_info    0x000000000001c4b4      0x978 _build_mp3_project/obj/lpc_peripherals.o
+ .debug_info    0x000000000001ce2c      0xf3e _build_mp3_project/obj/ssp2.o
+ .debug_info    0x000000000001dd6a     0x12e7 _build_mp3_project/obj/uart.o
 
 .debug_abbrev   0x0000000000000000     0x5754
  .debug_abbrev  0x0000000000000000      0x24e _build_mp3_project/obj/entry_point.o
@@ -3891,7 +3900,7 @@ OUTPUT(_build_mp3_project/mp3_project.elf elf32-littlearm)
  .debug_frame   0x0000000000003860       0x20 /Users/hamsikapongubala/Desktop/MP3-Project/toolchains/mac/gcc-arm-none-eabi-8-2019-q3-update/bin/../lib/gcc/arm-none-eabi/8.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libnosys.a(fstat.o)
  .debug_frame   0x0000000000003880       0x20 /Users/hamsikapongubala/Desktop/MP3-Project/toolchains/mac/gcc-arm-none-eabi-8-2019-q3-update/bin/../lib/gcc/arm-none-eabi/8.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libnosys.a(lseek.o)
 
-.debug_loc      0x0000000000000000     0xf8e3
+.debug_loc      0x0000000000000000     0xf8f0
  .debug_loc     0x0000000000000000       0x4c _build_mp3_project/obj/interrupt_vector_table.o
  .debug_loc     0x000000000000004c       0x23 _build_mp3_project/obj/clock.o
  .debug_loc     0x000000000000006f       0x3f _build_mp3_project/obj/crash.o
@@ -3908,21 +3917,21 @@ OUTPUT(_build_mp3_project/mp3_project.elf elf32-littlearm)
  .debug_loc     0x0000000000008313      0x107 _build_mp3_project/obj/peripherals_init.o
  .debug_loc     0x000000000000841a      0x160 _build_mp3_project/obj/sys_time.o
  .debug_loc     0x000000000000857a      0x302 _build_mp3_project/obj/uart_printf.o
- .debug_loc     0x000000000000887c      0x157 _build_mp3_project/obj/main.o
- .debug_loc     0x00000000000089d3       0xb8 _build_mp3_project/obj/rtos_hooks.o
- .debug_loc     0x0000000000008a8b       0xf8 _build_mp3_project/obj/port.o
- .debug_loc     0x0000000000008b83       0x93 _build_mp3_project/obj/heap_3.o
- .debug_loc     0x0000000000008c16       0xbd _build_mp3_project/obj/list.o
- .debug_loc     0x0000000000008cd3     0x2390 _build_mp3_project/obj/queue.o
- .debug_loc     0x000000000000b063     0x27b5 _build_mp3_project/obj/tasks.o
- .debug_loc     0x000000000000d818       0x59 _build_mp3_project/obj/board_io.o
- .debug_loc     0x000000000000d871      0x53a _build_mp3_project/obj/gpio.o
- .debug_loc     0x000000000000ddab      0x19b _build_mp3_project/obj/hw_timer.o
- .debug_loc     0x000000000000df46      0xc5c _build_mp3_project/obj/i2c.o
- .debug_loc     0x000000000000eba2       0x4a _build_mp3_project/obj/i2c_slave_init.o
- .debug_loc     0x000000000000ebec      0x221 _build_mp3_project/obj/lpc_peripherals.o
- .debug_loc     0x000000000000ee0d      0x232 _build_mp3_project/obj/ssp2.o
- .debug_loc     0x000000000000f03f      0x8a4 _build_mp3_project/obj/uart.o
+ .debug_loc     0x000000000000887c      0x164 _build_mp3_project/obj/main.o
+ .debug_loc     0x00000000000089e0       0xb8 _build_mp3_project/obj/rtos_hooks.o
+ .debug_loc     0x0000000000008a98       0xf8 _build_mp3_project/obj/port.o
+ .debug_loc     0x0000000000008b90       0x93 _build_mp3_project/obj/heap_3.o
+ .debug_loc     0x0000000000008c23       0xbd _build_mp3_project/obj/list.o
+ .debug_loc     0x0000000000008ce0     0x2390 _build_mp3_project/obj/queue.o
+ .debug_loc     0x000000000000b070     0x27b5 _build_mp3_project/obj/tasks.o
+ .debug_loc     0x000000000000d825       0x59 _build_mp3_project/obj/board_io.o
+ .debug_loc     0x000000000000d87e      0x53a _build_mp3_project/obj/gpio.o
+ .debug_loc     0x000000000000ddb8      0x19b _build_mp3_project/obj/hw_timer.o
+ .debug_loc     0x000000000000df53      0xc5c _build_mp3_project/obj/i2c.o
+ .debug_loc     0x000000000000ebaf       0x4a _build_mp3_project/obj/i2c_slave_init.o
+ .debug_loc     0x000000000000ebf9      0x221 _build_mp3_project/obj/lpc_peripherals.o
+ .debug_loc     0x000000000000ee1a      0x232 _build_mp3_project/obj/ssp2.o
+ .debug_loc     0x000000000000f04c      0x8a4 _build_mp3_project/obj/uart.o
 
 .stab           0x0000000000000000       0x54
  .stab          0x0000000000000000       0x24 /Users/hamsikapongubala/Desktop/MP3-Project/toolchains/mac/gcc-arm-none-eabi-8-2019-q3-update/bin/../lib/gcc/arm-none-eabi/8.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libnosys.a(close.o)
