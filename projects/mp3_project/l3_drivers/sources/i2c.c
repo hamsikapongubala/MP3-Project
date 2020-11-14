@@ -48,8 +48,6 @@ typedef struct {
   const uint8_t
       *output_byte_pointer; ///< Used for writing data to the I2C slave device
   size_t number_of_bytes_to_transfer;
-  uint8_t slave_index;
-  bool receive_flag;
 } i2c_s;
 
 /// Instances of structs for each I2C peripheral
@@ -333,17 +331,6 @@ static bool i2c__handle_state_machine(i2c_s *i2c) {
     I2C__STATE_MR_SLAVE_READ_NACK = 0x48,
     I2C__STATE_MR_SLAVE_ACK_SENT = 0x50,
     I2C__STATE_MR_SLAVE_NACK_SENT = 0x58,
-
-    // Slave Receiver States
-    I2C_SLAVE_STATE_0X60 = 0x60,
-    I2C_SLAVE_STATE_0X80 = 0x80,
-    I2C_SLAVE_STATE_0XA0 = 0xA0,
-
-    // Slave Transmitter States
-    I2C_SLAVE_STATE_0XA8 = 0xA8,
-    I2C_SLAVE_STATE_0XB8 = 0xB8,
-    I2C_SLAVE_STATE_0XC0 = 0xC0,
-    I2C_SLAVE_STATE_0XC8 = 0xC8
   };
 
   bool stop_sent = false;
@@ -370,51 +357,6 @@ static bool i2c__handle_state_machine(i2c_s *i2c) {
   I2C__DEBUG_PRINTF("  HW State: 0x%02X", i2c_state);
 
   switch (i2c_state) {
-
-  case I2C_SLAVE_STATE_0X60:
-    i2c__set_ack_flag(lpc_i2c);
-    i2c__clear_si_flag_for_hw_to_take_next_action(lpc_i2c);
-    i2c->receive_flag = true;
-    break;
-
-  case I2C_SLAVE_STATE_0X80:
-    if (i2c->receive_flag) {
-      i2c->slave_index = lpc_i2c->DAT;
-      i2c->receive_flag = false;
-    } else {
-      i2c_slave_callback__write_memory(i2c->slave_index++, lpc_i2c->DAT);
-    }
-    i2c__set_ack_flag(lpc_i2c);
-    i2c__clear_si_flag_for_hw_to_take_next_action(lpc_i2c);
-    break;
-
-  case I2C_SLAVE_STATE_0XA0:
-    i2c__set_ack_flag(lpc_i2c);
-    i2c__clear_si_flag_for_hw_to_take_next_action(lpc_i2c);
-    break;
-
-  case I2C_SLAVE_STATE_0XA8:
-    i2c_slave_callback__read_memory(i2c->slave_index++, &lpc_i2c->DAT);
-    i2c__set_ack_flag(lpc_i2c);
-    i2c__clear_si_flag_for_hw_to_take_next_action(lpc_i2c);
-    break;
-
-  case I2C_SLAVE_STATE_0XB8:
-    i2c_slave_callback__read_memory(i2c->slave_index++, &lpc_i2c->DAT);
-    i2c__set_ack_flag(lpc_i2c);
-    i2c__clear_si_flag_for_hw_to_take_next_action(lpc_i2c);
-    break;
-
-  case I2C_SLAVE_STATE_0XC0:
-    i2c__set_ack_flag(lpc_i2c);
-    i2c__clear_si_flag_for_hw_to_take_next_action(lpc_i2c);
-    break;
-
-  case I2C_SLAVE_STATE_0XC8:
-    i2c__set_ack_flag(lpc_i2c);
-    i2c__clear_si_flag_for_hw_to_take_next_action(lpc_i2c);
-    break;
-
   // Start condition sent, so send the device address
   case I2C__STATE_START:
     lpc_i2c->DAT = i2c__write_address(i2c->slave_address);
