@@ -4,11 +4,13 @@
 #include "lpc_peripherals.h"
 #include <stdint.h>
 #include <stdio.h>
-// Note: You may want another separate array for falling vs. rising edge callbacks
+// Note: You may want another separate array for falling vs. rising edge
+// callbacks
 static function_pointer_t gpio0_callbacks[32];
 static function_pointer_t gpio0_callbacks_f[32];
 
-void gpio0__attach_interrupt(uint32_t pin, gpio_interrupt_e interrupt_type, function_pointer_t callback) {
+void gpio0__attach_interrupt(uint32_t pin, gpio_interrupt_e interrupt_type,
+                             function_pointer_t callback) {
 
   if (interrupt_type == GPIO_INTR__RISING_EDGE) {
     gpio0_callbacks[(int)pin] = callback;

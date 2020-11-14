@@ -7,9 +7,10 @@
 #include "lpc40xx.h"
 
 /**
- * _estack symbol is actually a pointer to the start of the stack memory (provided by the linker script).
- * Declaring as unsigned int to inform compiler that this symbol is constant and defined at link time.
- * To get value, reference &_estack.
+ * _estack symbol is actually a pointer to the start of the stack memory
+ * (provided by the linker script). Declaring as unsigned int to inform compiler
+ * that this symbol is constant and defined at link time. To get value,
+ * reference &_estack.
  */
 extern void *_estack;
 
@@ -26,18 +27,21 @@ static void halt(void);
 static void isr_hard_fault(void);
 
 /**
- * This is non static otherwise compiler optimizes this function away but it is used in assembly code
- * Alternative is to use '__attribute__((used))' attribute prior to isr_hard_fault_handler()
+ * This is non static otherwise compiler optimizes this function away but it is
+ * used in assembly code Alternative is to use '__attribute__((used))' attribute
+ * prior to isr_hard_fault_handler()
  */
 void isr_hard_fault_handler(unsigned long *hardfault_args);
 
-__attribute__((section(".interrupt_vector_table"))) const function__void_f interrupt_vector_table[] = {
+__attribute__((section(".interrupt_vector_table")))
+const function__void_f interrupt_vector_table[] = {
     /**
      * Core interrupt vectors
      */
-    (function__void_f)&_estack,  // 0 ARM: Initial stack pointer
-    entry_point,                 // 1 ARM: Initial program counter; your board will explode if you change this
-    halt,                        // 2 ARM: Non-maskable interrupt
+    (function__void_f)&_estack, // 0 ARM: Initial stack pointer
+    entry_point, // 1 ARM: Initial program counter; your board will explode if
+                 // you change this
+    halt,        // 2 ARM: Non-maskable interrupt
     isr_hard_fault,              // 3 ARM: Hard fault
     halt,                        // 4 ARM: Memory management fault
     halt,                        // 5 ARM: Bus fault
@@ -49,7 +53,8 @@ __attribute__((section(".interrupt_vector_table"))) const function__void_f inter
     vPortSVCHandler_wrapper,     // 11 ARM: Supervisor call (SVCall)
     halt,                        // 12 ARM: Debug monitor
     halt,                        // 13 ARM: Reserved
-    xPortPendSVHandler_wrapper,  // 14 ARM: Pendable request for system service (PendableSrvReq)
+    xPortPendSVHandler_wrapper,  // 14 ARM: Pendable request for system service
+                                 // (PendableSrvReq)
     xPortSysTickHandler_wrapper, // 15 ARM: System Tick Timer (SysTick)
 
     /**
@@ -104,15 +109,19 @@ static void halt(void) {
 
   const unsigned isr_num = (*((uint8_t *)0xE000ED04));
   fprintf(stderr, "Unexpected CPU exception ");
-  fprintf(stderr, "%u (interrupt) has occured and the program will now halt\n", isr_num);
+  fprintf(stderr, "%u (interrupt) has occured and the program will now halt\n",
+          isr_num);
 
   if (isr_num < 16) {
-    static const char *table[] = {"estack",      "reset",    "NMI",      "hard fault", "memory fault", "bus fault",
-                                  "usage fault", "reserved", "reserved", "reserved",   "reserved",     "rtos",
-                                  "debug",       "reserved", "rtos",     "rtos"};
+    static const char *table[] = {
+        "estack",       "reset",     "NMI",         "hard fault",
+        "memory fault", "bus fault", "usage fault", "reserved",
+        "reserved",     "reserved",  "reserved",    "rtos",
+        "debug",        "reserved",  "rtos",        "rtos"};
     fprintf(stderr, "Exception appears to be '%s'\n", table[isr_num]);
   } else {
-    fprintf(stderr, "Did you register the interrupt correctly using lpc_peripherals.h API?");
+    fprintf(stderr, "Did you register the interrupt correctly using "
+                    "lpc_peripherals.h API?");
   }
 
   while (true) {

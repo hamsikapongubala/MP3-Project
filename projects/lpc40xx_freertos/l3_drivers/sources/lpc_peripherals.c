@@ -46,11 +46,13 @@ static void lpc_peripheral__halt_handler(void) {
 
 /**
  * Map of the user ISR registrations.
- * This is our own memory map that is used by lpc_peripheral__interrupt_dispatcher() and it is not the real ISR vector
- * The real ISR vector registers lpc_peripheral__interrupt_dispatcher() for all peripheral ISR and we dispatch user
- * registered ISR here.
+ * This is our own memory map that is used by
+ * lpc_peripheral__interrupt_dispatcher() and it is not the real ISR vector The
+ * real ISR vector registers lpc_peripheral__interrupt_dispatcher() for all
+ * peripheral ISR and we dispatch user registered ISR here.
  *
- * These will call the halt handler unless user changes their ISR slot by calling lpc_peripheral__enable_interrupt()
+ * These will call the halt handler unless user changes their ISR slot by
+ * calling lpc_peripheral__enable_interrupt()
  */
 static function__void_f lpc_peripheral__isr_registrations[32 + 9] = {
     lpc_peripheral__halt_handler, // 16 WDT
@@ -107,15 +109,17 @@ static traceHandle lpc_peripheral__trace_handles[32 + 9];
 
 /**
  * This function is intentionally not declared at the header file
- * This is registered by the startup code and registered as the interrupt callback for each peripheral
+ * This is registered by the startup code and registered as the interrupt
+ * callback for each peripheral
  */
 void lpc_peripheral__interrupt_dispatcher(void) {
   vRunTimeStatIsrEntry();
 
-  /* Get the IRQ number we are in.  Note that ICSR's real ISR bits are offset by 16.
-   * We can read ICSR register too, but let's just read 8-bits directly.
+  /* Get the IRQ number we are in.  Note that ICSR's real ISR bits are offset
+   * by 16. We can read ICSR register too, but let's just read 8-bits directly.
    */
-  const uint8_t isr_num = (*((uint8_t *)0xE000ED04)) - 16; // (SCB->ICSR & 0xFF) - 16;
+  const uint8_t isr_num =
+      (*((uint8_t *)0xE000ED04)) - 16; // (SCB->ICSR & 0xFF) - 16;
 
   /* Lookup the function pointer we want to call and make the call */
   function__void_f isr_to_service = lpc_peripheral__isr_registrations[isr_num];
@@ -131,14 +135,16 @@ void lpc_peripheral__interrupt_dispatcher(void) {
   // http://www.keil.com/support/docs/3928.htm
   static volatile int memory_write_to_avoid_spurious_interrupt;
   memory_write_to_avoid_spurious_interrupt = 0;
-  (void)memory_write_to_avoid_spurious_interrupt; // Avoid 'variable set but not used' warning
+  (void)memory_write_to_avoid_spurious_interrupt; // Avoid 'variable set but not
+                                                  // used' warning
 
   vRunTimeStatIsrExit();
 }
 
 void lpc_peripheral__turn_on_power_to(lpc_peripheral_e peripheral) {
   if (peripheral < sizeof(lpc_peripheral_pconp_bit_map)) {
-    const uint32_t power_on_bit = (uint32_t)lpc_peripheral_pconp_bit_map[peripheral];
+    const uint32_t power_on_bit =
+        (uint32_t)lpc_peripheral_pconp_bit_map[peripheral];
     LPC_SC->PCONP |= (UINT32_C(1) << power_on_bit);
   }
 }
@@ -147,14 +153,16 @@ bool lpc_peripheral__is_powered_on(lpc_peripheral_e peripheral) {
   bool powered_on = false;
 
   if (peripheral < sizeof(lpc_peripheral_pconp_bit_map)) {
-    const uint32_t power_on_bit = (uint32_t)lpc_peripheral_pconp_bit_map[peripheral];
+    const uint32_t power_on_bit =
+        (uint32_t)lpc_peripheral_pconp_bit_map[peripheral];
     powered_on = 0 != (LPC_SC->PCONP & (UINT32_C(1) << power_on_bit));
   }
 
   return powered_on;
 }
 
-void lpc_peripheral__enable_interrupt(lpc_peripheral_e peripheral, function__void_f isr_callback,
+void lpc_peripheral__enable_interrupt(lpc_peripheral_e peripheral,
+                                      function__void_f isr_callback,
                                       const char *name_for_rtos_trace) {
   // Sorry: Nasty hack because CAN1 shares interrupt with CAN0
   if (LPC_PERIPHERAL__CAN1 == peripheral) {
@@ -163,21 +171,26 @@ void lpc_peripheral__enable_interrupt(lpc_peripheral_e peripheral, function__voi
   lpc_peripheral__isr_registrations[peripheral] = isr_callback;
 
 #if (0 != configUSE_TRACE_FACILITY)
-  lpc_peripheral__trace_handles[peripheral] = xTraceSetISRProperties(name_for_rtos_trace, 0);
+  lpc_peripheral__trace_handles[peripheral] =
+      xTraceSetISRProperties(name_for_rtos_trace, 0);
 #endif
 
   /**
    * @note:
-   * lpc_peripheral_e should match IRQn_Type; we are not exposing NXP header file in our lpc_peripherals.h
-   * and therefore we create a mirror image of this enumeration.
+   * lpc_peripheral_e should match IRQn_Type; we are not exposing NXP header
+   * file in our lpc_peripherals.h and therefore we create a mirror image of
+   * this enumeration.
    *
    * @warning
-   * startup.c sets up interrupt priorities of all peripherals which needs to be at or lower priority than
-   * RTOS_HIGHEST_INTERRUPT_PRIORITY (configMAX_SYSCALL_INTERRUPT_PRIORITY). Make sure you DO NOT set the
-   * priority higher than the RTOS interrupt (note that higher priority means lower number)
+   * startup.c sets up interrupt priorities of all peripherals which needs to be
+   * at or lower priority than RTOS_HIGHEST_INTERRUPT_PRIORITY
+   * (configMAX_SYSCALL_INTERRUPT_PRIORITY). Make sure you DO NOT set the
+   * priority higher than the RTOS interrupt (note that higher priority means
+   * lower number)
    *
-   * Unless you really know what you are doing, never call NVIC_SetPriority() with a priority other than:
-   *    NVIC_SetPriority(peripheral, RTOS_HIGHEST_INTERRUPT_PRIORITY + 1);
+   * Unless you really know what you are doing, never call NVIC_SetPriority()
+   * with a priority other than: NVIC_SetPriority(peripheral,
+   * RTOS_HIGHEST_INTERRUPT_PRIORITY + 1);
    */
   const IRQn_Type irq_type = (IRQn_Type)peripheral;
   NVIC_EnableIRQ(irq_type); // Use CMS API

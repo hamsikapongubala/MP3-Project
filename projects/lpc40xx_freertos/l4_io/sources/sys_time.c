@@ -24,12 +24,15 @@ static void sys_time__one_minute_isr(void) {
  ******************************************************************************/
 
 void sys_time__init(uint32_t peripheral_clock_hz) {
-  const uint32_t prescalar_for_1us = (peripheral_clock_hz / sys_time__us_per_sec) - 1;
+  const uint32_t prescalar_for_1us =
+      (peripheral_clock_hz / sys_time__us_per_sec) - 1;
   const uint32_t one_minute_in_us = UINT32_C(60) * 1000 * 1000;
 
   // Enable the timer with 1uS resolution with an interrupt
-  hw_timer__enable(sys_time__hw_timer, prescalar_for_1us, sys_time__one_minute_isr);
-  hw_timer__enable_match_isr(sys_time__hw_timer, sys_time__hw_timer_mr, one_minute_in_us);
+  hw_timer__enable(sys_time__hw_timer, prescalar_for_1us,
+                   sys_time__one_minute_isr);
+  hw_timer__enable_match_isr(sys_time__hw_timer, sys_time__hw_timer_mr,
+                             one_minute_in_us);
 }
 
 uint64_t sys_time__get_uptime_us(void) {
@@ -39,9 +42,11 @@ uint64_t sys_time__get_uptime_us(void) {
 
   /**
    * Loop until we can safely read both the rollover value and the timer value.
-   * When the timer rolls over, the TC value will start from zero, and the 'after' value will be less than the 'before'
-   * value in which case, we will loop again and pick up the new rollover count.  This avoid critical section and
-   * simplifies the logic of reading sys_time__sec_counter and the 32-bit HW timer value.
+   * When the timer rolls over, the TC value will start from zero, and the
+   * 'after' value will be less than the 'before' value in which case, we will
+   * loop again and pick up the new rollover count.  This avoid critical section
+   * and simplifies the logic of reading sys_time__sec_counter and the 32-bit HW
+   * timer value.
    */
   do {
     before_us = hw_timer__get_value(sys_time__hw_timer);

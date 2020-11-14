@@ -11,7 +11,8 @@ typedef enum {
   UART_3,
 } uart_number_e;
 
-void uart_lab__init(uart_number_e uart, uint32_t peripheral_clock, uint32_t baud_rate);
+void uart_lab__init(uart_number_e uart, uint32_t peripheral_clock,
+                    uint32_t baud_rate);
 
 bool uart_lab__polled_get(uart_number_e uart, char *input_byte);
 

@@ -16,8 +16,10 @@ void delay__us(uint64_t us) {
   const uint64_t time_now_us = sys_time__get_uptime_us();
   const uint64_t time_to_wait_us = time_now_us + us;
 
-  // Use the RTOS for the larger delay period in milliseconds since this will sleep the CPU
-  const bool rtos_is_running = (taskSCHEDULER_RUNNING == xTaskGetSchedulerState());
+  // Use the RTOS for the larger delay period in milliseconds since this will
+  // sleep the CPU
+  const bool rtos_is_running =
+      (taskSCHEDULER_RUNNING == xTaskGetSchedulerState());
 
   // TODO: This assumes 1Khz OS tick rate
   if (rtos_is_running && us > 1000) {

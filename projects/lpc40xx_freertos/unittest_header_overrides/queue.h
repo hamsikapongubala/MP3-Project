@@ -41,15 +41,22 @@ typedef void *StaticQueue_t;
  *
  ******************************************************************************/
 QueueHandle_t xQueueCreate(UBaseType_t uxQueueLength, UBaseType_t uxItemSize);
-QueueHandle_t xQueueCreateStatic(UBaseType_t uxQueueLength, UBaseType_t uxItemSize, uint8_t *pucQueueStorageBuffer,
+QueueHandle_t xQueueCreateStatic(UBaseType_t uxQueueLength,
+                                 UBaseType_t uxItemSize,
+                                 uint8_t *pucQueueStorageBuffer,
                                  StaticQueue_t *pxQueueBuffer);
 
-BaseType_t xQueuePeek(QueueHandle_t xQueue, void *pvBuffer, TickType_t xTicksToWait);
-BaseType_t xQueueReceive(QueueHandle_t xQueue, void *const pvBuffer, TickType_t xTicksToWait);
-BaseType_t xQueueSend(QueueHandle_t xQueue, const void *const pvItemToQueue, TickType_t xTicksToWait);
+BaseType_t xQueuePeek(QueueHandle_t xQueue, void *pvBuffer,
+                      TickType_t xTicksToWait);
+BaseType_t xQueueReceive(QueueHandle_t xQueue, void *const pvBuffer,
+                         TickType_t xTicksToWait);
+BaseType_t xQueueSend(QueueHandle_t xQueue, const void *const pvItemToQueue,
+                      TickType_t xTicksToWait);
 BaseType_t xQueueOverwrite(QueueHandle_t xQueue, const void *pvItemToQueue);
 BaseType_t uxQueueMessagesWaitingFromISR(QueueHandle_t xQueue);
 BaseType_t uxQueueMessagesWaiting(QueueHandle_t xQueue);
-BaseType_t xQueueReceiveFromISR(QueueHandle_t xQueue, void *pvBuffer, BaseType_t *pxHigherPriorityTaskWoken);
-BaseType_t xQueueSendFromISR(QueueHandle_t xQueue, const void *pvItemToQueue, BaseType_t *pxHigherPriorityTaskWoken);
+BaseType_t xQueueReceiveFromISR(QueueHandle_t xQueue, void *pvBuffer,
+                                BaseType_t *pxHigherPriorityTaskWoken);
+BaseType_t xQueueSendFromISR(QueueHandle_t xQueue, const void *pvItemToQueue,
+                             BaseType_t *pxHigherPriorityTaskWoken);
 BaseType_t xQueueReset(QueueHandle_t xQueue);

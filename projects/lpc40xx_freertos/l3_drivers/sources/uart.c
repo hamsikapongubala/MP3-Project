@@ -6,7 +6,8 @@
 #include "lpc40xx.h"
 #include "lpc_peripherals.h"
 
-/// Alias the LPC defined typedef in case we have to define it differently for a different CPU
+/// Alias the LPC defined typedef in case we have to define it differently for a
+/// different CPU
 typedef LPC_UART_TypeDef lpc_uart;
 
 /**
@@ -20,14 +21,16 @@ typedef struct {
   QueueHandle_t queue_receive;
 } uart_s;
 
-/// @{ ISR functions for all UARTs; these are lightweight that simply call uart__isr_common()
+/// @{ ISR functions for all UARTs; these are lightweight that simply call
+/// uart__isr_common()
 static void uart0_isr(void);
 static void uart1_isr(void);
 static void uart2_isr(void);
 static void uart3_isr(void);
 /// @}
 
-static void uart__isr_common(uart_s *uart_type); ///< Common function for all UART ISRs
+static void
+uart__isr_common(uart_s *uart_type); ///< Common function for all UART ISRs
 
 /*******************************************************************************
  *
@@ -39,8 +42,9 @@ static void uart__isr_common(uart_s *uart_type); ///< Common function for all UA
  * Some UARTs have a different memory map, but it matches the base registers, so
  * we can use the same memory map to provide a generic driver for all UARTs
  *
- * UART1 for instance has same registers like UART0, but has additional modem control registers
- * but these extra registers are at the end of the memory map that matches with UART0
+ * UART1 for instance has same registers like UART0, but has additional modem
+ * control registers but these extra registers are at the end of the memory map
+ * that matches with UART0
  */
 static uart_s uarts[] = {
     {(lpc_uart *)LPC_UART0, "Uart0"},
@@ -49,9 +53,11 @@ static uart_s uarts[] = {
     {(lpc_uart *)LPC_UART3, "Uart3"},
 };
 
-static void (*const uart__isrs[])(void) = {uart0_isr, uart1_isr, uart2_isr, uart3_isr};
-static const lpc_peripheral_e uart_peripheral_ids[] = {LPC_PERIPHERAL__UART0, LPC_PERIPHERAL__UART1,
-                                                       LPC_PERIPHERAL__UART2, LPC_PERIPHERAL__UART3};
+static void (*const uart__isrs[])(void) = {uart0_isr, uart1_isr, uart2_isr,
+                                           uart3_isr};
+static const lpc_peripheral_e uart_peripheral_ids[] = {
+    LPC_PERIPHERAL__UART0, LPC_PERIPHERAL__UART1, LPC_PERIPHERAL__UART2,
+    LPC_PERIPHERAL__UART3};
 
 /*******************************************************************************
  *
@@ -59,8 +65,12 @@ static const lpc_peripheral_e uart_peripheral_ids[] = {LPC_PERIPHERAL__UART0, LP
  *
  ******************************************************************************/
 
-static bool uart__is_receive_queue_enabled(uart_e uart) { return (NULL != uarts[uart].queue_receive); }
-static bool uart__is_transmit_queue_enabled(uart_e uart) { return (NULL != uarts[uart].queue_transmit); }
+static bool uart__is_receive_queue_enabled(uart_e uart) {
+  return (NULL != uarts[uart].queue_receive);
+}
+static bool uart__is_transmit_queue_enabled(uart_e uart) {
+  return (NULL != uarts[uart].queue_transmit);
+}
 
 static void uart__wait_for_transmit_to_complete(lpc_uart *uart_regs) {
   const uint32_t transmitter_empty = (1 << 5);
@@ -76,7 +86,8 @@ static bool uart__load_pending_transmit_bytes(uart_s *uart_type) {
   BaseType_t higher_priority_task_woke = 0;
 
   for (size_t counter = 0; counter < hw_fifo_size; counter++) {
-    if (xQueueReceiveFromISR(uart_type->queue_transmit, &transmit_byte, &higher_priority_task_woke)) {
+    if (xQueueReceiveFromISR(uart_type->queue_transmit, &transmit_byte,
+                             &higher_priority_task_woke)) {
       uart_type->registers->THR = transmit_byte;
       if (higher_priority_task_woke) {
         context_switch_required = true;
@@ -96,12 +107,14 @@ static bool uart__clear_receive_fifo(uart_s *uart_type) {
   BaseType_t higher_priority_task_woke = 0;
 
   /**
-   * While receive Hardware FIFO not empty, keep queuing the data. Even if xQueueSendFromISR()
-   * fails (Queue is full), we still need to read RBR register otherwise interrupt will not clear
+   * While receive Hardware FIFO not empty, keep queuing the data. Even if
+   * xQueueSendFromISR() fails (Queue is full), we still need to read RBR
+   * register otherwise interrupt will not clear
    */
   while (uart_type->registers->LSR & char_available_bitmask) {
     const char received_byte = uart_type->registers->RBR;
-    xQueueSendFromISR(uart_type->queue_receive, &received_byte, &higher_priority_task_woke);
+    xQueueSendFromISR(uart_type->queue_receive, &received_byte,
+                      &higher_priority_task_woke);
 
     if (higher_priority_task_woke) {
       context_switch_required = true;
@@ -113,9 +126,11 @@ static bool uart__clear_receive_fifo(uart_s *uart_type) {
 
 static void uart__enable_receive_and_transmit_interrupts(uart_e uart) {
   uart_s *uart_type = &uarts[uart];
-  lpc_peripheral__enable_interrupt(uart_peripheral_ids[uart], uart__isrs[uart], uart_type->rtos_isr_trace_name);
+  lpc_peripheral__enable_interrupt(uart_peripheral_ids[uart], uart__isrs[uart],
+                                   uart_type->rtos_isr_trace_name);
 
-  const uint32_t enable_rx_tx_interrupts = (1 << 0) | (1 << 1) | (1 << 2); // B0:Rx, B1: Tx
+  const uint32_t enable_rx_tx_interrupts =
+      (1 << 0) | (1 << 1) | (1 << 2); // B0:Rx, B1: Tx
   uart_type->registers->IER = enable_rx_tx_interrupts;
 }
 
@@ -134,7 +149,8 @@ static void uart__isr_common(uart_s *uart_type) {
     receive_data_available_timeout = (6 << 0),
   } interrupt_reason_e;
 
-  const interrupt_reason_e interrupt_reason = (interrupt_reason_e)((uart_type->registers->IIR & 0xE) >> 1);
+  const interrupt_reason_e interrupt_reason =
+      (interrupt_reason_e)((uart_type->registers->IIR & 0xE) >> 1);
 
   switch (interrupt_reason) {
   case transmitter_empty:
@@ -166,7 +182,8 @@ void uart__init(uart_e uart, uint32_t peripheral_clock, uint32_t baud_rate) {
   lpc_peripheral__turn_on_power_to(uart_peripheral_ids[uart]);
 
   const float roundup_offset = 0.5;
-  const uint16_t divider = (uint16_t)((peripheral_clock / (16 * baud_rate)) + roundup_offset);
+  const uint16_t divider =
+      (uint16_t)((peripheral_clock / (16 * baud_rate)) + roundup_offset);
   const uint8_t dlab_bit = (1 << 7);
   const uint8_t eight_bit_datalen = 3;
 
@@ -176,8 +193,8 @@ void uart__init(uart_e uart, uint32_t peripheral_clock, uint32_t baud_rate) {
   uart_regs->DLM = (divider >> 8) & 0xFF;
   uart_regs->DLL = (divider >> 0) & 0xFF;
 
-  /* Bootloader uses Uart0 fractional dividers and can wreck havoc in our baud rate code, so re-initialize it
-   * Lesson learned: DO NOT RELY ON RESET VALUES
+  /* Bootloader uses Uart0 fractional dividers and can wreck havoc in our baud
+   * rate code, so re-initialize it Lesson learned: DO NOT RELY ON RESET VALUES
    */
   const uint32_t default_reset_fdr_value = (1 << 4);
   uart_regs->FDR = default_reset_fdr_value;
@@ -193,12 +210,16 @@ void uart__init(uart_e uart, uint32_t peripheral_clock, uint32_t baud_rate) {
 }
 
 bool uart__is_initialized(uart_e uart) {
-  return lpc_peripheral__is_powered_on(uart_peripheral_ids[uart]) && (0 != uarts[uart].registers->LCR);
+  return lpc_peripheral__is_powered_on(uart_peripheral_ids[uart]) &&
+         (0 != uarts[uart].registers->LCR);
 }
 
-bool uart__is_transmit_queue_initialized(uart_e uart) { return uart__is_transmit_queue_enabled(uart); }
+bool uart__is_transmit_queue_initialized(uart_e uart) {
+  return uart__is_transmit_queue_enabled(uart);
+}
 
-bool uart__enable_queues(uart_e uart, QueueHandle_t queue_receive, QueueHandle_t queue_transmit) {
+bool uart__enable_queues(uart_e uart, QueueHandle_t queue_receive,
+                         QueueHandle_t queue_transmit) {
   bool status = false;
   uart_s *uart_type = &uarts[uart];
 
@@ -220,7 +241,8 @@ bool uart__enable_queues(uart_e uart, QueueHandle_t queue_receive, QueueHandle_t
     }
 
     // Enable peripheral_id interrupt if all is well
-    status = uart__is_receive_queue_enabled(uart) && uart__is_transmit_queue_enabled(uart);
+    status = uart__is_receive_queue_enabled(uart) &&
+             uart__is_transmit_queue_enabled(uart);
     if (status) {
       uart__enable_receive_and_transmit_interrupts(uart);
     }
@@ -232,15 +254,18 @@ bool uart__enable_queues(uart_e uart, QueueHandle_t queue_receive, QueueHandle_t
 bool uart__polled_get(uart_e uart, char *input_byte) {
   bool status = false;
 
-  const bool rtos_is_running = taskSCHEDULER_RUNNING == xTaskGetSchedulerState();
+  const bool rtos_is_running =
+      taskSCHEDULER_RUNNING == xTaskGetSchedulerState();
   const bool queue_is_enabled = uart__is_receive_queue_enabled(uart);
 
   if (uart__is_initialized(uart)) {
-    /* If the RTOS is running and queues are enabled, then we will be unable to access the
-     * RBR register directly since the interrupt would occur and read out the RBR.
+    /* If the RTOS is running and queues are enabled, then we will be unable to
+     * access the RBR register directly since the interrupt would occur and read
+     * out the RBR.
      *
      * So when the user calls this function with the RTOS and queues enabled,
-     * then we opt to block forever using uart__get() to provide 'polled' behavior.
+     * then we opt to block forever using uart__get() to provide 'polled'
+     * behavior.
      */
     if (rtos_is_running && queue_is_enabled) {
       status = uart__get(uart, input_byte, UINT32_MAX);
@@ -275,14 +300,16 @@ bool uart__polled_put(uart_e uart, char output_byte) {
 
 bool uart__get(uart_e uart, char *input_byte, uint32_t timeout_ms) {
   bool status = false;
-  const bool rtos_is_running = taskSCHEDULER_RUNNING == xTaskGetSchedulerState();
+  const bool rtos_is_running =
+      taskSCHEDULER_RUNNING == xTaskGetSchedulerState();
 
   /* If a user calls this function without the RTOS running, we fail gracefully.
    * We do not desire to perform polling because that would involve time keeping
    * without an RTOS which increases the driver complexity.
    */
   if (uart__is_receive_queue_enabled(uart) && rtos_is_running) {
-    status = xQueueReceive(uarts[uart].queue_receive, input_byte, RTOS_MS_TO_TICKS(timeout_ms));
+    status = xQueueReceive(uarts[uart].queue_receive, input_byte,
+                           RTOS_MS_TO_TICKS(timeout_ms));
   }
 
   return status;
@@ -290,14 +317,17 @@ bool uart__get(uart_e uart, char *input_byte, uint32_t timeout_ms) {
 
 bool uart__put(uart_e uart, char output_byte, uint32_t timeout_ms) {
   bool status = false;
-  const bool rtos_is_running = taskSCHEDULER_RUNNING == xTaskGetSchedulerState();
+  const bool rtos_is_running =
+      taskSCHEDULER_RUNNING == xTaskGetSchedulerState();
 
   if (uart__is_transmit_queue_enabled(uart) && rtos_is_running) {
     // Deposit to the transmit queue for now
-    status = xQueueSend(uarts[uart].queue_transmit, &output_byte, RTOS_MS_TO_TICKS(timeout_ms));
+    status = xQueueSend(uarts[uart].queue_transmit, &output_byte,
+                        RTOS_MS_TO_TICKS(timeout_ms));
 
-    /* 'Transmit Complete Interrupt' may have already fired when we get here, so if there is no further pending data
-     * to be sent, it will not fire again to send any data. Hence, we check here in a critical section if transmit
+    /* 'Transmit Complete Interrupt' may have already fired when we get here, so
+     * if there is no further pending data to be sent, it will not fire again to
+     * send any data. Hence, we check here in a critical section if transmit
      * holder register is empty, and kick-off the tranmisssion
      */
     portENTER_CRITICAL();
@@ -307,9 +337,11 @@ bool uart__put(uart_e uart, char output_byte, uint32_t timeout_ms) {
 
       if (uart_regs->LSR & uart_tx_is_idle) {
         /* Receive oldest char from the queue to send
-         * Since we are inside a critical section, we use FromISR() FreeRTOS API  variant
+         * Since we are inside a critical section, we use FromISR() FreeRTOS API
+         * variant
          */
-        if (xQueueReceiveFromISR(uarts[uart].queue_transmit, &output_byte, NULL)) {
+        if (xQueueReceiveFromISR(uarts[uart].queue_transmit, &output_byte,
+                                 NULL)) {
           uart_regs->THR = output_byte;
         }
       }

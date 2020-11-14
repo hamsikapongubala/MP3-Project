@@ -20,7 +20,6 @@
 #include "sj2_cli.h"
 #include "string.h"
 
-
 void led_checker(void) {
   const uint8_t led = (1 << 3);
   LPC_GPIO2->DIR |= led;
@@ -48,10 +47,13 @@ int main(void) {
 
   i2c2__slave_init(I2C__1, 0x86);
 
-  // xTaskCreate(led_checker, "led_checker", 1024 / sizeof(void *), NULL, PRIORITY_LOW, NULL);
+  // xTaskCreate(led_checker, "led_checker", 1024 / sizeof(void *), NULL,
+  // PRIORITY_LOW, NULL);
 
-  xTaskCreate(sj2_cli__init, "sj2_cli", 1024 / sizeof(void *), NULL, PRIORITY_LOW, NULL);
-  vTaskStartScheduler(); // This function never returns unless RTOS scheduler runs out of memory and fails
+  xTaskCreate(sj2_cli__init, "sj2_cli", 1024 / sizeof(void *), NULL,
+              PRIORITY_LOW, NULL);
+  vTaskStartScheduler(); // This function never returns unless RTOS scheduler
+                         // runs out of memory and fails
 
   return 0;
 }

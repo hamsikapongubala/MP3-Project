@@ -1,12 +1,14 @@
 /* SIBROS TECHNOLOGIES, INC. CONFIDENTIAL
  * Copyright (c) 2018 - 2019 Sibros Technologies, Inc.
  * All Rights Reserved.
- * NOTICE: All information contained herein is, and remains the property of Sibros Technologies,
- * Inc. and its suppliers, if any. The intellectual and technical concepts contained herein are
- * proprietary to Sibros Technologies, Inc. and its suppliers and may be covered by U.S. and Foreign
- * Patents, patents in process, and are protected by trade secret or copyright law. Dissemination of
- * this information or reproduction of this material is strictly forbidden unless prior written
- * permission is obtained from Sibros Technologies, Inc.
+ * NOTICE: All information contained herein is, and remains the property of
+ * Sibros Technologies, Inc. and its suppliers, if any. The intellectual and
+ * technical concepts contained herein are proprietary to Sibros Technologies,
+ * Inc. and its suppliers and may be covered by U.S. and Foreign Patents,
+ * patents in process, and are protected by trade secret or copyright law.
+ * Dissemination of this information or reproduction of this material is
+ * strictly forbidden unless prior written permission is obtained from Sibros
+ * Technologies, Inc.
  */
 
 #include <stdio.h>
@@ -24,7 +26,8 @@
  *****************************************************************************/
 const size_t sl_header_length = sizeof(sl_string_size_t);
 const char *test_very_long_string =
-    "test test test test test test test test test test test test test test test test test test test test test";
+    "test test test test test test test test test test test test test test "
+    "test test test test test test test";
 
 /*******************************************************************************
  *
@@ -65,12 +68,14 @@ const size_t string_memory_pad_size = 10;
  *****************************************************************************/
 void setUp(void) {
   memset(string_memory, 'p', sizeof(string_memory));
-  str = sl_string__initialize(string_memory, sizeof(string_memory) - string_memory_pad_size);
+  str = sl_string__initialize(string_memory,
+                              sizeof(string_memory) - string_memory_pad_size);
 }
 
 void tearDown(void) {
   const char *expected_str = "pppppppppp";
-  TEST_ASSERT_EQUAL_STRING(expected_str, string_memory + sizeof(string_memory) - string_memory_pad_size);
+  TEST_ASSERT_EQUAL_STRING(expected_str, string_memory + sizeof(string_memory) -
+                                             string_memory_pad_size);
 }
 
 /******************************************************************************
@@ -81,11 +86,13 @@ void tearDown(void) {
 
 void test_sl_string__initialize_successful(void) {
   TEST_ASSERT_EQUAL_PTR(string_memory + 2, str);
-  TEST_ASSERT_EQUAL_UINT(sizeof(string_memory) - string_memory_pad_size, ((str[-2]) << 8) | str[-1]);
+  TEST_ASSERT_EQUAL_UINT(sizeof(string_memory) - string_memory_pad_size,
+                         ((str[-2]) << 8) | str[-1]);
 }
 
 void test_sl_string__initialize_unsuccessful_null_mem(void) {
-  sl_string_t null_str = sl_string__initialize(NULL, sizeof(string_memory) - string_memory_pad_size);
+  sl_string_t null_str = sl_string__initialize(
+      NULL, sizeof(string_memory) - string_memory_pad_size);
 
   TEST_ASSERT_EQUAL_PTR(NULL, null_str);
 }
@@ -97,20 +104,23 @@ void test_sl_string__initialize_unsuccessful_mem_size_zero(void) {
 }
 
 void test_sl_string__initialize_from_successful(void) {
-  sl_string_t intalized_from_str =
-      sl_string__initialize_from(string_memory, sizeof(string_memory) - string_memory_pad_size, "Hello World");
+  sl_string_t intalized_from_str = sl_string__initialize_from(
+      string_memory, sizeof(string_memory) - string_memory_pad_size,
+      "Hello World");
 
   TEST_ASSERT_EQUAL_PTR(string_memory + 2, str);
-  TEST_ASSERT_EQUAL_UINT(sizeof(string_memory) - string_memory_pad_size, ((str[-2]) << 8) | str[-1]);
+  TEST_ASSERT_EQUAL_UINT(sizeof(string_memory) - string_memory_pad_size,
+                         ((str[-2]) << 8) | str[-1]);
   TEST_ASSERT_EQUAL_STRING("Hello World", intalized_from_str);
 }
 
 void test_sl_string__initialize_from_null_init_string(void) {
-  sl_string_t intalized_from_str =
-      sl_string__initialize_from(string_memory, sizeof(string_memory) - string_memory_pad_size, NULL);
+  sl_string_t intalized_from_str = sl_string__initialize_from(
+      string_memory, sizeof(string_memory) - string_memory_pad_size, NULL);
 
   TEST_ASSERT_EQUAL_PTR(string_memory + 2, str);
-  TEST_ASSERT_EQUAL_UINT(sizeof(string_memory) - string_memory_pad_size, ((str[-2]) << 8) | str[-1]);
+  TEST_ASSERT_EQUAL_UINT(sizeof(string_memory) - string_memory_pad_size,
+                         ((str[-2]) << 8) | str[-1]);
   TEST_ASSERT_EQUAL_STRING("", intalized_from_str);
 }
 
@@ -122,7 +132,8 @@ void test_sl_string__initialize_from_null_string_memory(void) {
 }
 
 void test_sl_string__get_capacity(void) {
-  TEST_ASSERT_EQUAL_UINT(sizeof(string_memory) - string_memory_pad_size - sl_header_length - 1,
+  TEST_ASSERT_EQUAL_UINT(sizeof(string_memory) - string_memory_pad_size -
+                             sl_header_length - 1,
                          sl_string__get_capacity(str));
 }
 
@@ -137,7 +148,9 @@ void test_sl_string__is_full(void) {
   TEST_ASSERT_TRUE(sl_string__is_full(s));
 }
 
-void test_sl_string__get_length_empty_string(void) { TEST_ASSERT_EQUAL_UINT(0, sl_string__get_length(str)); }
+void test_sl_string__get_length_empty_string(void) {
+  TEST_ASSERT_EQUAL_UINT(0, sl_string__get_length(str));
+}
 
 void test_sl_string__get_length_non_empty_string(void) {
   const char *hello = "hello world";
@@ -236,7 +249,9 @@ void test_sl_string__to_int_unsuccessful_contains_non_int_chars(void) {
   TEST_ASSERT_EQUAL_INT(0, sl_string__to_int(str));
 }
 
-void test_sl_string__to_int_unsuccessful_empty_string(void) { TEST_ASSERT_EQUAL_INT(0, sl_string__to_int(str)); }
+void test_sl_string__to_int_unsuccessful_empty_string(void) {
+  TEST_ASSERT_EQUAL_INT(0, sl_string__to_int(str));
+}
 
 void test_sl_string__to_float_successful(void) {
   sl_string__printf(str, "%s", "1.23");
@@ -280,7 +295,9 @@ void test_sl_string__is_alpha_contains_non_alpha_chars(void) {
   TEST_ASSERT_FALSE(sl_string__is_alpha(str));
 }
 
-void test_sl_string__is_alpha_empty_string(void) { TEST_ASSERT_TRUE(sl_string__is_alpha(str)); }
+void test_sl_string__is_alpha_empty_string(void) {
+  TEST_ASSERT_TRUE(sl_string__is_alpha(str));
+}
 
 void test_sl_string__is_alphanum_successful(void) {
   sl_string__printf(str, "%s", "Hello123Word");
@@ -302,7 +319,9 @@ void test_sl_string__is_alphanum_contains_non_alphanum_chars(void) {
   TEST_ASSERT_FALSE(sl_string__is_alphanum(str));
 }
 
-void test_sl_string__is_alphanum_empty_string(void) { TEST_ASSERT_TRUE(sl_string__is_alphanum(str)); }
+void test_sl_string__is_alphanum_empty_string(void) {
+  TEST_ASSERT_TRUE(sl_string__is_alphanum(str));
+}
 
 void test_sl_string__clear(void) {
   sl_string__set(str, "Hello World");
@@ -316,7 +335,9 @@ void test_sl_string__clear_all_memory(void) {
   sl_string__set(str, "Hello World");
 
   sl_string__clear_all_memory(str);
-  for (uint16_t character = 0; character < sizeof(string_memory) - string_memory_pad_size; character++) {
+  for (uint16_t character = 0;
+       character < sizeof(string_memory) - string_memory_pad_size;
+       character++) {
     TEST_ASSERT_EQUAL_UINT8('\0', str[0]);
   }
 
@@ -336,7 +357,8 @@ void test_sl_string__to_upper(void) {
 }
 
 void test_sl_string__printf_successful(void) {
-  const int printed_count = sl_string__printf(str, "String1 %s, Int: %d, String2: %s", "Hello", 123, "World");
+  const int printed_count = sl_string__printf(
+      str, "String1 %s, Int: %d, String2: %s", "Hello", 123, "World");
   const char *expected_str = "String1 Hello, Int: 123, String2: World";
 
   TEST_ASSERT_EQUAL_INT(strlen(expected_str), printed_count);
@@ -344,13 +366,15 @@ void test_sl_string__printf_successful(void) {
 }
 
 void test_sl_string__printf_with_string_size_zero(void) {
-  sl_string_t m_str = sl_string__initialize(string_memory, sizeof(string_memory) - string_memory_pad_size);
+  sl_string_t m_str = sl_string__initialize(
+      string_memory, sizeof(string_memory) - string_memory_pad_size);
   const int printed_count = sl_string__printf(m_str, "%s", "");
   TEST_ASSERT_EQUAL_INT(0, printed_count);
 }
 
 void test_sl_string__printf_append_with_string_size_zero(void) {
-  sl_string_t m_str = sl_string__initialize(string_memory, sizeof(string_memory) - string_memory_pad_size);
+  sl_string_t m_str = sl_string__initialize(
+      string_memory, sizeof(string_memory) - string_memory_pad_size);
   const int printed_count = sl_string__printf_append(m_str, "%s", "");
   TEST_ASSERT_EQUAL_INT(0, printed_count);
 }
@@ -360,26 +384,32 @@ void test_sl_string__printf_filename_format(void) {
   const sl_string_t directory_name = "logs";
   const sl_string_t preceding_name = "debuglog";
   const sl_string_t tagname = "predump";
-  sl_string_t file_name = sl_string__initialize(string_memory, sizeof(string_memory) - string_memory_pad_size);
-  const int printed_count = sl_string__printf(file_name, "%s/%s__%s.in_use", directory_name, preceding_name, tagname);
+  sl_string_t file_name = sl_string__initialize(
+      string_memory, sizeof(string_memory) - string_memory_pad_size);
+  const int printed_count = sl_string__printf(
+      file_name, "%s/%s__%s.in_use", directory_name, preceding_name, tagname);
   TEST_ASSERT_EQUAL_INT(strlen(file_name), printed_count);
   TEST_ASSERT_EQUAL_STRING(expected_filename, file_name);
 }
 
 void test_sl_string__scanf_with_arg_size_zero(void) {
   char *hello_str = "";
-  sl_string_t m_str = sl_string__initialize(string_memory, sizeof(string_memory) - string_memory_pad_size);
+  sl_string_t m_str = sl_string__initialize(
+      string_memory, sizeof(string_memory) - string_memory_pad_size);
   int parsed_count = sl_string__scanf(m_str, "%s", hello_str);
   TEST_ASSERT_EQUAL_INT(0, parsed_count);
 }
 
 void test_sl_string__printf_truncated(void) {
   const int printed_count =
-      sl_string__printf(str, "String1 %s, Int: %d, String2: %s", test_very_long_string, 123, "test");
+      sl_string__printf(str, "String1 %s, Int: %d, String2: %s",
+                        test_very_long_string, 123, "test");
   const char *expected_str =
-      "String1 test test test test test test test test test test test test test test test test test test";
+      "String1 test test test test test test test test test test test test "
+      "test test test test test test";
   const char *expected_str_before_truncation =
-      "String1 test test test test test test test test test test test test test test test test test test test test "
+      "String1 test test test test test test test test test test test test "
+      "test test test test test test test test "
       "test, Int: 123, String2: test";
 
   TEST_ASSERT_EQUAL_INT(strlen(expected_str_before_truncation), printed_count);
@@ -388,7 +418,8 @@ void test_sl_string__printf_truncated(void) {
 
 void test_sl_string__printf_append_successful(void) {
   sl_string__append(str, "Append ");
-  const int printed_count = sl_string__printf_append(str, "String1 %s, Int: %d, String2: %s", "Hello", 123, "World");
+  const int printed_count = sl_string__printf_append(
+      str, "String1 %s, Int: %d, String2: %s", "Hello", 123, "World");
   const char *expected_str_appended = "String1 Hello, Int: 123, String2: World";
   const char *expected_str = "Append String1 Hello, Int: 123, String2: World";
 
@@ -399,14 +430,18 @@ void test_sl_string__printf_append_successful(void) {
 void test_sl_string__printf_append_truncated(void) {
   sl_string__append(str, "Append ");
   int printed_count =
-      sl_string__printf_append(str, "String1 %s, Int: %d, String2: %s", test_very_long_string, 123, "test");
+      sl_string__printf_append(str, "String1 %s, Int: %d, String2: %s",
+                               test_very_long_string, 123, "test");
   const char *expected_str =
-      "Append String1 test test test test test test test test test test test test test test test test te";
+      "Append String1 test test test test test test test test test test test "
+      "test test test test test te";
   const char *expected_str_appended_before_truncation =
-      "String1 test test test test test test test test test test test test test test test test test test test test "
+      "String1 test test test test test test test test test test test test "
+      "test test test test test test test test "
       "test, Int: 123, String2: test";
 
-  TEST_ASSERT_EQUAL_INT(strlen(expected_str_appended_before_truncation), printed_count);
+  TEST_ASSERT_EQUAL_INT(strlen(expected_str_appended_before_truncation),
+                        printed_count);
   TEST_ASSERT_EQUAL_STRING(expected_str, str);
 
   printed_count = sl_string__printf_append(str, "%s", test_very_long_string);
@@ -421,7 +456,8 @@ void test_sl_string__scanf_successful(void) {
   int num = 0;
 
   sl_string__set(str, "Hello 123 World");
-  const int scanned_count = sl_string__scanf(str, "%20s %d %20s", string1, &num, string2);
+  const int scanned_count =
+      sl_string__scanf(str, "%20s %d %20s", string1, &num, string2);
 
   TEST_ASSERT_EQUAL_INT(3, scanned_count);
   TEST_ASSERT_EQUAL_STRING("Hello", string1);
@@ -436,7 +472,8 @@ void test_sl_string__tokenize_successful(void) {
   char *two = NULL;
   char *three = NULL;
 
-  TEST_ASSERT_EQUAL_INT(3, sl_string__tokenize(str, " ", 3, &one, &two, &three));
+  TEST_ASSERT_EQUAL_INT(3,
+                        sl_string__tokenize(str, " ", 3, &one, &two, &three));
 
   TEST_ASSERT_EQUAL_STRING("Hello", one);
   TEST_ASSERT_EQUAL_STRING("123", two);
@@ -450,7 +487,8 @@ void test_sl_string__tokenize_unsuccessful_null_delimiter(void) {
   char *two = NULL;
   char *three = NULL;
 
-  TEST_ASSERT_EQUAL_INT(-1, sl_string__tokenize(str, NULL, 3, &one, &two, &three));
+  TEST_ASSERT_EQUAL_INT(-1,
+                        sl_string__tokenize(str, NULL, 3, &one, &two, &three));
 
   TEST_ASSERT_EQUAL_STRING(NULL, one);
   TEST_ASSERT_EQUAL_STRING(NULL, two);
@@ -480,7 +518,8 @@ void test_sl_string__set(void) {
   TEST_ASSERT_TRUE(sl_string__set(str, "hello"));
   TEST_ASSERT_EQUAL_STRING("hello", str);
 
-  // When string does not have enough memory (capacity is 2 when memory length is 5)
+  // When string does not have enough memory (capacity is 2 when memory length
+  // is 5)
   str = sl_string__initialize(string_memory, 5);
   TEST_ASSERT_TRUE(sl_string__set(str, "hi"));
   TEST_ASSERT_EQUAL_STRING("hi", str);
@@ -499,7 +538,8 @@ void test_sl_string__insert_at_success(void) {
 
 void test_sl_string__insert_at_pos_out_of_bounds(void) {
   sl_string__set(str, "Hello World");
-  TEST_ASSERT_FALSE(sl_string__insert_at(str, sizeof("Hello World"), "Hello 123 Word"));
+  TEST_ASSERT_FALSE(
+      sl_string__insert_at(str, sizeof("Hello World"), "Hello 123 Word"));
   TEST_ASSERT_EQUAL_STRING("Hello World", str);
 }
 
@@ -554,7 +594,8 @@ void test_sl_string__equals_to_ignore_case_successful(void) {
   TEST_ASSERT_TRUE(sl_string__equals_to_ignore_case(str, "hello world"));
 }
 
-void test_sl_string__equals_to_ignore_case_unsuccessful_strings_dont_match(void) {
+void test_sl_string__equals_to_ignore_case_unsuccessful_strings_dont_match(
+    void) {
   sl_string__set(str, "Hello World");
   TEST_ASSERT_FALSE(sl_string__equals_to_ignore_case(str, "Hello 123 Word"));
 }
@@ -603,7 +644,8 @@ void test_sl_string__last_index_of_ignore_case_not_found(void) {
   TEST_ASSERT_EQUAL_INT(-1, sl_string__last_index_of_ignore_case(str, "hey"));
 }
 
-void test_sl_string__last_index_of_ignore_case_unsuccessful_null_substring(void) {
+void test_sl_string__last_index_of_ignore_case_unsuccessful_null_substring(
+    void) {
   sl_string__set(str, "Hello World Hello World");
   TEST_ASSERT_EQUAL_INT(-1, sl_string__last_index_of_ignore_case(str, NULL));
 }
@@ -643,7 +685,8 @@ void test_sl_string__first_index_of_ignore_case_not_found(void) {
   TEST_ASSERT_EQUAL_INT(-1, sl_string__first_index_of_ignore_case(str, "hey"));
 }
 
-void test_sl_string__first_index_of_ignore_case_unsuccessful_null_substring(void) {
+void test_sl_string__first_index_of_ignore_case_unsuccessful_null_substring(
+    void) {
   sl_string__set(str, "Hello World Hello World");
   TEST_ASSERT_EQUAL_INT(-1, sl_string__first_index_of_ignore_case(str, NULL));
 }
@@ -794,38 +837,49 @@ void test_sl_string__begins_with_whole_word_unsuccessful_null_params(void) {
 void test_sl_string__begins_with_whole_word_ignore_case_found(void) {
   sl_string__printf(str, "%s", "Hello World");
 
-  TEST_ASSERT_TRUE(sl_string__begins_with_whole_word_ignore_case(str, "HeLlO", " "));
+  TEST_ASSERT_TRUE(
+      sl_string__begins_with_whole_word_ignore_case(str, "HeLlO", " "));
 
   sl_string__printf(str, "%s", "Hello;World");
 
-  TEST_ASSERT_TRUE(sl_string__begins_with_whole_word_ignore_case(str, "heLlO", ";"));
+  TEST_ASSERT_TRUE(
+      sl_string__begins_with_whole_word_ignore_case(str, "heLlO", ";"));
 }
 
 void test_sl_string__begins_with_whole_word_ignore_case_not_found(void) {
   sl_string__set(str, "HelloWorld");
-  TEST_ASSERT_FALSE(sl_string__begins_with_whole_word_ignore_case(str, "HeLlO", " "));
+  TEST_ASSERT_FALSE(
+      sl_string__begins_with_whole_word_ignore_case(str, "HeLlO", " "));
 }
 
-void test_sl_string__begins_with_whole_word_ignore_case_unsuccessful_null_params(void) {
+void test_sl_string__begins_with_whole_word_ignore_case_unsuccessful_null_params(
+    void) {
   sl_string__set(str, "Hello World");
 
-  TEST_ASSERT_FALSE(sl_string__begins_with_whole_word_ignore_case(str, NULL, " "));
-  TEST_ASSERT_FALSE(sl_string__begins_with_whole_word_ignore_case(str, "Hello", NULL));
+  TEST_ASSERT_FALSE(
+      sl_string__begins_with_whole_word_ignore_case(str, NULL, " "));
+  TEST_ASSERT_FALSE(
+      sl_string__begins_with_whole_word_ignore_case(str, "Hello", NULL));
 }
 
-void test_sl_string__begins_with_whole_word_ignore_case_unsuccessful_large_substring(void) {
+void test_sl_string__begins_with_whole_word_ignore_case_unsuccessful_large_substring(
+    void) {
   sl_string__set(str, "World");
-  TEST_ASSERT_FALSE(sl_string__begins_with_whole_word_ignore_case(str, "Hello World", ""));
+  TEST_ASSERT_FALSE(
+      sl_string__begins_with_whole_word_ignore_case(str, "Hello World", ""));
 }
 
 void test_sl_string__begins_with_whole_word_ignore_case_not_matching(void) {
   sl_string__set(str, "World");
-  TEST_ASSERT_FALSE(sl_string__begins_with_whole_word_ignore_case(str, "orld", ""));
+  TEST_ASSERT_FALSE(
+      sl_string__begins_with_whole_word_ignore_case(str, "orld", ""));
 }
 
-void test_sl_string__begins_with_whole_word_ignore_case_string_delimeter_null(void) {
+void test_sl_string__begins_with_whole_word_ignore_case_string_delimeter_null(
+    void) {
   sl_string__set(str, "World,");
-  TEST_ASSERT_TRUE(sl_string__begins_with_whole_word_ignore_case(str, "World", "\0"));
+  TEST_ASSERT_TRUE(
+      sl_string__begins_with_whole_word_ignore_case(str, "World", "\0"));
 }
 
 void test_sl_string__ends_with_found(void) {
@@ -959,14 +1013,16 @@ void test_sl_string__erase_after_successful(void) {
 void test_sl_string__erase_after_index_out_of_bounds(void) {
   sl_string__set(str, "Hello World");
 
-  TEST_ASSERT_FALSE(sl_string__erase_after(str, sl_string__get_length(str) + 1, 3));
+  TEST_ASSERT_FALSE(
+      sl_string__erase_after(str, sl_string__get_length(str) + 1, 3));
   TEST_ASSERT_EQUAL_STRING("Hello World", str);
 }
 
 void test_sl_string__erase_after_n_chars_longer_than_string(void) {
   sl_string__set(str, "Hello World");
 
-  TEST_ASSERT_TRUE(sl_string__erase_after(str, 0, sl_string__get_length(str) + 1));
+  TEST_ASSERT_TRUE(
+      sl_string__erase_after(str, 0, sl_string__get_length(str) + 1));
   TEST_ASSERT_EQUAL_STRING("", str);
 }
 
@@ -1009,8 +1065,9 @@ void test_sl_string__erase_special_chars_no_special_chars(void) {
 }
 
 void test_erase_int(void) {
-  sl_string_t s =
-      sl_string__initialize_from(string_memory, sizeof(string_memory) - string_memory_pad_size, "111 222ab333 ;a.444");
+  sl_string_t s = sl_string__initialize_from(
+      string_memory, sizeof(string_memory) - string_memory_pad_size,
+      "111 222ab333 ;a.444");
   int result = -1;
 
   TEST_ASSERT_TRUE(sl_string__erase_int(s, &result));
@@ -1159,18 +1216,22 @@ void test_sl_string__replace_all_substring_not_found(void) {
 }
 
 void test_sl_string__replace_all_double_slash_with_slash(void) {
-  const char *expected_filename = "sibros/can_module/logs/debuglog__predump.in_use";
+  const char *expected_filename =
+      "sibros/can_module/logs/debuglog__predump.in_use";
   const sl_string_t directory_name = "sibros/can_module/logs/";
   const sl_string_t preceding_name = "debuglog";
   const sl_string_t tagname = "predump";
-  sl_string_t file_name = sl_string__initialize(string_memory, sizeof(string_memory) - string_memory_pad_size);
-  const int printed_count = sl_string__printf(file_name, "%s/%s__%s.in_use", directory_name, preceding_name, tagname);
+  sl_string_t file_name = sl_string__initialize(
+      string_memory, sizeof(string_memory) - string_memory_pad_size);
+  const int printed_count = sl_string__printf(
+      file_name, "%s/%s__%s.in_use", directory_name, preceding_name, tagname);
   TEST_ASSERT_EQUAL_INT(strlen(file_name), printed_count);
   // replace double slash with slash from middle of the string
   TEST_ASSERT_EQUAL_INT(1, sl_string__replace_all(file_name, "//", "/"));
   TEST_ASSERT_EQUAL_STRING(expected_filename, file_name);
 
-  sl_string_t string_with_slash = "/sibros/can_module/logs/debuglog__predump.in_use";
+  sl_string_t string_with_slash =
+      "/sibros/can_module/logs/debuglog__predump.in_use";
   // adding slash in the beginning of string_with_slash
   sl_string__printf(file_name, "/%s", string_with_slash); // re-use file_name
   // replace double slash with slash from beginning of the string

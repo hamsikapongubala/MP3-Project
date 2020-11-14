@@ -3,10 +3,14 @@
 #include <stdint.h>
 
 /// Should alter the hardware registers to set the pin as input
-void gpio0__set_as_input(uint8_t pin_num) { LPC_GPIO1->DIR &= ~(1U << pin_num); }
+void gpio0__set_as_input(uint8_t pin_num) {
+  LPC_GPIO1->DIR &= ~(1U << pin_num);
+}
 
 /// Should alter the hardware registers to set the pin as output
-void gpio0__set_as_output(uint8_t pin_num) { LPC_GPIO1->DIR |= (1U << pin_num); }
+void gpio0__set_as_output(uint8_t pin_num) {
+  LPC_GPIO1->DIR |= (1U << pin_num);
+}
 
 /// Should alter the hardware registers to set the pin as high
 void gpio0__set_high(uint8_t pin_num) {

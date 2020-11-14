@@ -27,7 +27,8 @@ bool i2c_slave_callback__read_memory(uint8_t memory_index, uint8_t *memory) {
   return true;
 }
 
-bool i2c_slave_callback__write_memory(uint8_t memory_index, uint8_t memory_value) {
+bool i2c_slave_callback__write_memory(uint8_t memory_index,
+                                      uint8_t memory_value) {
 
   if (memory_index > 256) {
     return false;
@@ -37,4 +38,3 @@ bool i2c_slave_callback__write_memory(uint8_t memory_index, uint8_t memory_value
 
   return true;
 }
-

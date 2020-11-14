@@ -3,7 +3,8 @@
 
 #include "uart_printf.h"
 
-// uart_printf API uses this sized stack buffer to print messages; this can be re-defined if you need to override it
+// uart_printf API uses this sized stack buffer to print messages; this can be
+// re-defined if you need to override it
 #ifndef UART_PRINT__BUFFER_SIZE_IN_BYTES
 #define UART_PRINT__BUFFER_SIZE_IN_BYTES 128
 #endif
@@ -13,7 +14,8 @@ int uart_printf(uart_e uart, const char *format, ...) {
 
   va_list args;
   va_start(args, format);
-  const int would_print = vsnprintf(print_buffer, sizeof(print_buffer), format, args);
+  const int would_print =
+      vsnprintf(print_buffer, sizeof(print_buffer), format, args);
   va_end(args);
 
   const int actual_print = strlen(print_buffer);
@@ -37,7 +39,8 @@ int uart_printf__polled(uart_e uart, const char *format, ...) {
 
   va_list args;
   va_start(args, format);
-  const int would_print = vsnprintf(print_buffer, sizeof(print_buffer), format, args);
+  const int would_print =
+      vsnprintf(print_buffer, sizeof(print_buffer), format, args);
   va_end(args);
 
   const int actual_print = strlen(print_buffer);

@@ -15,9 +15,11 @@ typedef struct {
 } crash__registers_s;
 
 /**
- * Records the crash signature, and returns the struct pointer to populate further members
- * It is best to not print out the data during the crash, so this merely "records" it and then upon the next
- * boot, crash__report_if_occurred() should be used to print the crash report when the system is healthy
+ * Records the crash signature, and returns the struct pointer to populate
+ * further members It is best to not print out the data during the crash, so
+ * this merely "records" it and then upon the next boot,
+ * crash__report_if_occurred() should be used to print the crash report when the
+ * system is healthy
  */
 crash__registers_s *crash__record_get(void);
 

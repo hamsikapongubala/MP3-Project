@@ -6,7 +6,8 @@
  * Keep this RAM data at a specific location that is not wiped out on startup
  * Note: This section is not part of the *data or *bss section
  */
-__attribute__((section(".persistent_ram"))) static crash__registers_s crash_registers;
+__attribute__((
+    section(".persistent_ram"))) static crash__registers_s crash_registers;
 
 static const uint32_t crash__signature = 0xDEADBEEF;
 
@@ -23,7 +24,8 @@ crash__registers_s *crash__record_get(void) {
 bool crash__report_if_occurred(void) {
   bool crash_occured = false;
 
-  if (crash__signature == crash_registers.signature && ~crash__signature == crash_registers.signature_inverted) {
+  if (crash__signature == crash_registers.signature &&
+      ~crash__signature == crash_registers.signature_inverted) {
     crash_occured = true;
 
     fprintf(stderr, "----------------------------------------\n"
@@ -38,11 +40,12 @@ bool crash__report_if_occurred(void) {
     fprintf(stderr, "  R2: 0x%08lX\n", crash_registers.registers[2]);
     fprintf(stderr, "  R3: 0x%08lX\n", crash_registers.registers[3]);
 
-    fprintf(stderr, "\n"
-                    "  Find the *.lst file in your _build directory, and lookup\n"
-                    "  the PC value to locate which function caused this.\n"
-                    "  The LR should be the 'previous' function that was running.\n"
-                    "  R0-R3 are parameters to functions.\n");
+    fprintf(stderr,
+            "\n"
+            "  Find the *.lst file in your _build directory, and lookup\n"
+            "  the PC value to locate which function caused this.\n"
+            "  The LR should be the 'previous' function that was running.\n"
+            "  R0-R3 are parameters to functions.\n");
   }
 
   crash__clear_record();

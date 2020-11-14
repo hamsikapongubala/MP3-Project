@@ -27,7 +27,8 @@ static void your_receive_interrupt(void) {
 void uart__enable_receive_interrupt(uart_number_e uart_number) {
 
   NVIC_EnableIRQ(UART3_IRQn);
-  lpc_peripheral__enable_interrupt(LPC_PERIPHERAL__UART3, your_receive_interrupt, "UART_GPIO");
+  lpc_peripheral__enable_interrupt(LPC_PERIPHERAL__UART3,
+                                   your_receive_interrupt, "UART_GPIO");
 
   if (uart_number == UART_3) {
     LPC_UART3->LCR &= ~(1 << 7);
@@ -46,7 +47,8 @@ bool uart_lab__get_char_from_queue(char *input_byte, uint32_t timeout) {
   return xQueueReceive(your_uart_rx_queue, input_byte, timeout);
 }
 
-void uart_lab__init(uart_number_e uart, uint32_t peripheral_clock, uint32_t baud_rate) {
+void uart_lab__init(uart_number_e uart, uint32_t peripheral_clock,
+                    uint32_t baud_rate) {
   /* Baud = PCLK / (16 * (DMM* 256 + DLL))
    * (DMM* 256 + DLL) = PCLK/ (16* Baud)
    */

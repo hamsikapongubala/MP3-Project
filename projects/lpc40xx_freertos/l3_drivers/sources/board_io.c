@@ -34,15 +34,21 @@ static gpio_s board_io__led0, board_io__led1, board_io__led2, board_io__led3;
 static gpio_s board_io__sw0, board_io__sw1, board_io__sw2, board_io__sw3;
 
 void board_io__initialize(void) {
-  // Note: return type of gpio__construct_with_function() because we do not need GPIO instance after its configuration
+  // Note: return type of gpio__construct_with_function() because we do not need
+  // GPIO instance after its configuration
 
-  gpio__construct_with_function(GPIO__PORT_0, 2, GPIO__FUNCTION_1); // P0.2 - Uart-0 Tx
-  gpio__construct_with_function(GPIO__PORT_0, 3, GPIO__FUNCTION_1); // P0.3 - Uart-0 Rx
+  gpio__construct_with_function(GPIO__PORT_0, 2,
+                                GPIO__FUNCTION_1); // P0.2 - Uart-0 Tx
+  gpio__construct_with_function(GPIO__PORT_0, 3,
+                                GPIO__FUNCTION_1); // P0.3 - Uart-0 Rx
 
   // SPI bus 2 (SSP2)
-  gpio__construct_with_function(GPIO__PORT_1, 0, GPIO__FUNCTION_4); // P1.0 - SCK2
-  gpio__construct_with_function(GPIO__PORT_1, 1, GPIO__FUNCTION_4); // P1.1 - MOSI2
-  gpio__construct_with_function(GPIO__PORT_1, 4, GPIO__FUNCTION_4); // P1.4 - MISO2
+  gpio__construct_with_function(GPIO__PORT_1, 0,
+                                GPIO__FUNCTION_4); // P1.0 - SCK2
+  gpio__construct_with_function(GPIO__PORT_1, 1,
+                                GPIO__FUNCTION_4); // P1.1 - MOSI2
+  gpio__construct_with_function(GPIO__PORT_1, 4,
+                                GPIO__FUNCTION_4); // P1.4 - MISO2
 
   // SD card
   gpio__construct_as_output(GPIO__PORT_1, 8); // SD card CS
@@ -50,8 +56,10 @@ void board_io__initialize(void) {
   gpio__construct_as_input(GPIO__PORT_1, 9); // SD card detect
 
   // I2C pins; these require open-drain mode to be enabled
-  const gpio_s sda_2 = gpio__construct_with_function(GPIO__PORT_0, 10, GPIO__FUNCTION_2); // P0.10 - SDA
-  const gpio_s scl_2 = gpio__construct_with_function(GPIO__PORT_0, 11, GPIO__FUNCTION_2); // P0.11 - SCL
+  const gpio_s sda_2 = gpio__construct_with_function(
+      GPIO__PORT_0, 10, GPIO__FUNCTION_2); // P0.10 - SDA
+  const gpio_s scl_2 = gpio__construct_with_function(
+      GPIO__PORT_0, 11, GPIO__FUNCTION_2); // P0.11 - SCL
   gpio__enable_open_drain(sda_2);
   gpio__enable_open_drain(scl_2);
 
@@ -79,7 +87,8 @@ void board_io__sd_card_cs(void) { LPC_GPIO1->CLR = board_io__sd_card_cs_pin; }
 void board_io__sd_card_ds(void) { LPC_GPIO1->SET = board_io__sd_card_cs_pin; }
 
 bool board_io__sd_card_is_present(void) {
-  const uint32_t card_present_bitmask = (LPC_GPIO1->PIN & board_io__sd_card_detect_pin);
+  const uint32_t card_present_bitmask =
+      (LPC_GPIO1->PIN & board_io__sd_card_detect_pin);
   return (0 == card_present_bitmask); // Signal is active low
 }
 

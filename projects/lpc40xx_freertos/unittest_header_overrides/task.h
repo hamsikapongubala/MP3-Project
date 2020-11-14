@@ -51,13 +51,15 @@ TickType_t xTaskGetTickCount(void);
 TickType_t xTaskGetTickCountFromISR(void);
 
 void vTaskDelay(const TickType_t xTicksToDelay);
-void vTaskDelayUntil(TickType_t *const pxPreviousWakeTime, const TickType_t xTimeIncrement);
+void vTaskDelayUntil(TickType_t *const pxPreviousWakeTime,
+                     const TickType_t xTimeIncrement);
 
 BaseType_t xTaskCreate(
     TaskFunction_t pxTaskCode,
-    const char *const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-    const configSTACK_DEPTH_TYPE usStackDepth, void *const pvParameters, UBaseType_t uxPriority,
-    TaskHandle_t *const pxCreatedTask);
+    const char *const pcName, /*lint !e971 Unqualified char types are allowed
+                                 for strings and single characters only. */
+    const configSTACK_DEPTH_TYPE usStackDepth, void *const pvParameters,
+    UBaseType_t uxPriority, TaskHandle_t *const pxCreatedTask);
 
 #ifdef __cplusplus
 } /* extern "C" */

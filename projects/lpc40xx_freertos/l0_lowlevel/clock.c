@@ -6,13 +6,16 @@
  * FreeRTOS 'configCPU_CLOCK_HZ' references this code to get the CPU frequency.
  * Then, the Cortex-M4 port uses that reference to configure the RTOS tick rate.
  *
- * We use fixed CPU frequency because clock__initialize_system_clock_96mhz() configures
- * fixed CPU frequency. It is rare that anyone needs to change this (ever).
+ * We use fixed CPU frequency because clock__initialize_system_clock_96mhz()
+ * configures fixed CPU frequency. It is rare that anyone needs to change this
+ * (ever).
  */
 uint32_t clock__get_core_clock_hz(void) { return (UINT32_C(96) * 1000 * 1000); }
 
 // We set PCLKSEL to 1, and hence peripheral clock is the same as core clock
-uint32_t clock__get_peripheral_clock_hz(void) { return clock__get_core_clock_hz(); }
+uint32_t clock__get_peripheral_clock_hz(void) {
+  return clock__get_core_clock_hz();
+}
 
 void clock__initialize_system_clock_96mhz(void) {
   // Step 3 from UM: Write PLL new setup values to the PLL CFG register
@@ -34,7 +37,8 @@ void clock__initialize_system_clock_96mhz(void) {
     ;
   }
 
-  // Before we switch to the faster clock, we need to configure flash memory access properly with respect to core clock
+  // Before we switch to the faster clock, we need to configure flash memory
+  // access properly with respect to core clock
   uint32_t flash_cfg = LPC_SC->FLASHCFG;
   flash_cfg &= ~(0xF << 12);
   flash_cfg |= (0x4 << 12); // 5 cpu clocks for use with up to 100Mhz

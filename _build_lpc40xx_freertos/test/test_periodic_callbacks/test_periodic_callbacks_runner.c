@@ -83,8 +83,8 @@ static void run_test(UnityTestFunction func, const char* name, int line_num)
 int main(void)
 {
   UnityBegin("projects/lpc40xx_freertos/l5_application/periodics/test/test_periodic_callbacks.c");
-  run_test(test__periodic_callbacks__initialize, "test__periodic_callbacks__initialize", 19);
-  run_test(test__periodic_callbacks__1Hz, "test__periodic_callbacks__1Hz", 21);
+  run_test(test__periodic_callbacks__initialize, "test__periodic_callbacks__initialize", 20);
+  run_test(test__periodic_callbacks__1Hz, "test__periodic_callbacks__1Hz", 24);
 
   CMock_Guts_MemFreeFinal();
   return UnityEnd();

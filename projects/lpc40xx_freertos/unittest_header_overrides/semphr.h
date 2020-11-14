@@ -39,8 +39,10 @@ typedef void *StaticSemaphore_t;
  *
  ******************************************************************************/
 
-SemaphoreHandle_t xSemaphoreCreateBinaryStatic(StaticSemaphore_t *pxSemaphoreBuffer);
+SemaphoreHandle_t
+xSemaphoreCreateBinaryStatic(StaticSemaphore_t *pxSemaphoreBuffer);
 SemaphoreHandle_t xSemaphoreCreateMutexStatic(StaticSemaphore_t *pxMutexBuffer);
 
-BaseType_t xSemaphoreTake(SemaphoreHandle_t xSemaphore, TickType_t xTicksToWait);
+BaseType_t xSemaphoreTake(SemaphoreHandle_t xSemaphore,
+                          TickType_t xTicksToWait);
 BaseType_t xSemaphoreGive(SemaphoreHandle_t xSemaphore);

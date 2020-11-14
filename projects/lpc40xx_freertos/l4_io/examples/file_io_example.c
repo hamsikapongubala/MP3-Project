@@ -8,11 +8,14 @@
 #include "sys_time.h"
 
 /**
- * This is a file reader task that will continously open a file and read all its contents
- * It can be run as a test task by adding this sample code where "file.txt" is the filename
+ * This is a file reader task that will continously open a file and read all its
+ contents
+ * It can be run as a test task by adding this sample code where "file.txt" is
+ the filename
  *
     void file_io_example__task(void *params);
-    xTaskCreate(file_io_example__task, "file", (512U * 8) / sizeof(void *), "file.txt", PRIORITY_HIGH, NULL);
+    xTaskCreate(file_io_example__task, "file", (512U * 8) / sizeof(void *),
+ "file.txt", PRIORITY_HIGH, NULL);
  */
 void file_io_example__task(void *params) {
   const char *filename = (const char *)params;
@@ -35,8 +38,8 @@ void file_io_example__task(void *params) {
     }
 
     if (FR_OK == result) {
-      printf("%lu: File read successfully: %lu bytes in %lu ticks\n", xTaskGetTickCount(), f_size(&file),
-             (xTaskGetTickCount() - ticks));
+      printf("%lu: File read successfully: %lu bytes in %lu ticks\n",
+             xTaskGetTickCount(), f_size(&file), (xTaskGetTickCount() - ticks));
     } else {
       printf("File failed to be opened, error %i\n", result);
     }

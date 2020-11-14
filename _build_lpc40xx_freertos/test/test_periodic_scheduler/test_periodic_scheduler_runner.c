@@ -81,7 +81,7 @@ static void run_test(UnityTestFunction func, const char* name, int line_num)
 int main(void)
 {
   UnityBegin("projects/lpc40xx_freertos/l5_application/periodics/test/test_periodic_scheduler.c");
-  run_test(test_periodic_scheduler__initialize, "test_periodic_scheduler__initialize", 29);
+  run_test(test_periodic_scheduler__initialize, "test_periodic_scheduler__initialize", 31);
 
   CMock_Guts_MemFreeFinal();
   return UnityEnd();
