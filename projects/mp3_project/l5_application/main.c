@@ -11,6 +11,7 @@
 #include "sj2_cli.h"
 #include "task.h"
 #include "uart.h"
+#include "lcd.h"
 
 QueueHandle_t song_name_q;
 static QueueHandle_t mp3_data_q;
@@ -99,6 +100,8 @@ app_cli_status_e cli__mp3_play(app_cli__argument_t argument,
 
 int main(void) {
   mp3_decoder_setup();
+  lcd_init();
+  LCD_print_char("H");
 
   setvbuf(stdout, 0, _IONBF, 0);
 

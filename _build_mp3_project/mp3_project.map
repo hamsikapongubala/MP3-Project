@@ -199,12 +199,22 @@ __lock___atexit_recursive_mutex
 __lock___arc4random_mutex
                     0x1               /Users/hamsikapongubala/Desktop/MP3-Project/toolchains/mac/gcc-arm-none-eabi-8-2019-q3-update/bin/../lib/gcc/arm-none-eabi/8.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(lib_a-lock.o)
 errno               0x4               /Users/hamsikapongubala/Desktop/MP3-Project/toolchains/mac/gcc-arm-none-eabi-8-2019-q3-update/bin/../lib/gcc/arm-none-eabi/8.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(lib_a-reent.o)
+LCD_D0              0x1               _build_mp3_project/obj/lcd.o
+LCD_D4              0x1               _build_mp3_project/obj/lcd.o
 __lock___env_recursive_mutex
                     0x1               /Users/hamsikapongubala/Desktop/MP3-Project/toolchains/mac/gcc-arm-none-eabi-8-2019-q3-update/bin/../lib/gcc/arm-none-eabi/8.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(lib_a-lock.o)
 __lock___sinit_recursive_mutex
                     0x1               /Users/hamsikapongubala/Desktop/MP3-Project/toolchains/mac/gcc-arm-none-eabi-8-2019-q3-update/bin/../lib/gcc/arm-none-eabi/8.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(lib_a-lock.o)
+LCD_EN              0x1               _build_mp3_project/obj/lcd.o
 __lock___malloc_recursive_mutex
                     0x1               /Users/hamsikapongubala/Desktop/MP3-Project/toolchains/mac/gcc-arm-none-eabi-8-2019-q3-update/bin/../lib/gcc/arm-none-eabi/8.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(lib_a-lock.o)
+LCD_D7              0x1               _build_mp3_project/obj/lcd.o
+LCD_D3              0x1               _build_mp3_project/obj/lcd.o
+LCD_RS              0x1               _build_mp3_project/obj/lcd.o
+LCD_D1              0x1               _build_mp3_project/obj/lcd.o
+LCD_D5              0x1               _build_mp3_project/obj/lcd.o
+LCD_D6              0x1               _build_mp3_project/obj/lcd.o
+LCD_D2              0x1               _build_mp3_project/obj/lcd.o
 __lock___at_quick_exit_mutex
                     0x1               /Users/hamsikapongubala/Desktop/MP3-Project/toolchains/mac/gcc-arm-none-eabi-8-2019-q3-update/bin/../lib/gcc/arm-none-eabi/8.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libg_nano.a(lib_a-lock.o)
 song_name_q         0x4               _build_mp3_project/obj/main.o
@@ -1021,6 +1031,30 @@ Discarded input sections
  .debug_frame   0x0000000000000000       0x40 _build_mp3_project/obj/i2c_slave_init.o
  .ARM.attributes
                 0x0000000000000000       0x34 _build_mp3_project/obj/i2c_slave_init.o
+ .text          0x0000000000000000        0x0 _build_mp3_project/obj/lcd.o
+ .data          0x0000000000000000        0x0 _build_mp3_project/obj/lcd.o
+ .bss           0x0000000000000000        0x0 _build_mp3_project/obj/lcd.o
+ .text.write_to_data_bus
+                0x0000000000000000       0xe0 _build_mp3_project/obj/lcd.o
+ .text.lcd_init
+                0x0000000000000000       0xd0 _build_mp3_project/obj/lcd.o
+ .text.LCD_print_char
+                0x0000000000000000        0x6 _build_mp3_project/obj/lcd.o
+ .text.LCD_print_string
+                0x0000000000000000       0x1c _build_mp3_project/obj/lcd.o
+ .debug_info    0x0000000000000000      0x522 _build_mp3_project/obj/lcd.o
+ .debug_abbrev  0x0000000000000000      0x1be _build_mp3_project/obj/lcd.o
+ .debug_loc     0x0000000000000000       0xe5 _build_mp3_project/obj/lcd.o
+ .debug_aranges
+                0x0000000000000000       0x38 _build_mp3_project/obj/lcd.o
+ .debug_ranges  0x0000000000000000       0x48 _build_mp3_project/obj/lcd.o
+ .debug_line    0x0000000000000000      0x34c _build_mp3_project/obj/lcd.o
+ .debug_str     0x0000000000000000      0x301 _build_mp3_project/obj/lcd.o
+ .comment       0x0000000000000000       0x77 _build_mp3_project/obj/lcd.o
+ .debug_frame   0x0000000000000000       0x80 _build_mp3_project/obj/lcd.o
+ .ARM.attributes
+                0x0000000000000000       0x34 _build_mp3_project/obj/lcd.o
+ COMMON         0x0000000000000000        0xa _build_mp3_project/obj/lcd.o
  .text          0x0000000000000000        0x0 _build_mp3_project/obj/lpc_peripherals.o
  .data          0x0000000000000000        0x0 _build_mp3_project/obj/lpc_peripherals.o
  .bss           0x0000000000000000        0x0 _build_mp3_project/obj/lpc_peripherals.o
@@ -1549,6 +1583,7 @@ LOAD _build_mp3_project/obj/gpio_lab.o
 LOAD _build_mp3_project/obj/hw_timer.o
 LOAD _build_mp3_project/obj/i2c.o
 LOAD _build_mp3_project/obj/i2c_slave_init.o
+LOAD _build_mp3_project/obj/lcd.o
 LOAD _build_mp3_project/obj/lpc_peripherals.o
 LOAD _build_mp3_project/obj/mp3_decoder.o
 LOAD _build_mp3_project/obj/pwm1.o
