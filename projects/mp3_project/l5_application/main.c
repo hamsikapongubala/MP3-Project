@@ -5,13 +5,13 @@
 #include "cli_handlers.h"
 #include "common_macros.h"
 #include "ff.h"
+#include "lcd.h"
 #include "mp3_decoder.h"
 #include "periodic_scheduler.h"
 #include "queue.h"
 #include "sj2_cli.h"
 #include "task.h"
 #include "uart.h"
-#include "lcd.h"
 
 QueueHandle_t song_name_q;
 static QueueHandle_t mp3_data_q;
