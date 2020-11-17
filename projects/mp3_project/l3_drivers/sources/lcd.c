@@ -5,7 +5,10 @@ gpio_s LCD_EN, LCD_RS, LCD_D0, LCD_D1, LCD_D2, LCD_D3, LCD_D4, LCD_D5, LCD_D6,
 
 void lcd_init() {
   LCD_EN = gpio__construct_as_output(GPIO__PORT_0, 6); // E
+  gpio__construct_with_function(GPIO__PORT_0, 6, GPIO__FUNCITON_0_IO_PIN);
+  
   LCD_RS = gpio__construct_as_output(GPIO__PORT_0, 7); // RS
+  gpio__construct_with_function(GPIO__PORT_0, 7, GPIO__FUNCITON_0_IO_PIN);
 
   LCD_D0 = gpio__construct_as_output(GPIO__PORT_0, 26); // D0
   LCD_D1 = gpio__construct_as_output(GPIO__PORT_0, 25); // D1
@@ -15,6 +18,17 @@ void lcd_init() {
   LCD_D5 = gpio__construct_as_output(GPIO__PORT_1, 23); // D5
   LCD_D6 = gpio__construct_as_output(GPIO__PORT_1, 28); // D6
   LCD_D7 = gpio__construct_as_output(GPIO__PORT_1, 29); // D7
+
+  gpio__construct_with_function(GPIO__PORT_0, 26, GPIO__FUNCITON_0_IO_PIN);
+  gpio__construct_with_function(GPIO__PORT_0, 25, GPIO__FUNCITON_0_IO_PIN);
+  gpio__construct_with_function(GPIO__PORT_1, 31, GPIO__FUNCITON_0_IO_PIN);
+  gpio__construct_with_function(GPIO__PORT_1, 30, GPIO__FUNCITON_0_IO_PIN);
+  gpio__construct_with_function(GPIO__PORT_1, 20, GPIO__FUNCITON_0_IO_PIN);
+  gpio__construct_with_function(GPIO__PORT_1, 23, GPIO__FUNCITON_0_IO_PIN);
+  gpio__construct_with_function(GPIO__PORT_1, 28, GPIO__FUNCITON_0_IO_PIN);
+  gpio__construct_with_function(GPIO__PORT_1, 29, GPIO__FUNCITON_0_IO_PIN);
+  
+
 
   write_to_data_bus(0x32, 0); // Display init
   write_to_data_bus(0x38, 0); // 8-bit data bus, 3 line display (0x30)?
