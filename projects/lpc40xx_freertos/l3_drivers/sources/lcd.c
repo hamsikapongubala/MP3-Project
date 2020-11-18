@@ -13,8 +13,8 @@ void lcd_pin_init() {
   LCD_RS = gpio__construct_as_output(GPIO__PORT_1, 4); // RS
   gpio__construct_with_function(GPIO__PORT_1, 4, GPIO__FUNCITON_0_IO_PIN);
 
-  LCD_RW = gpio__construct_as_output(GPIO__PORT_4, 28); // RW
-  gpio__construct_with_function(GPIO__PORT_4, 28, GPIO__FUNCITON_0_IO_PIN);
+  LCD_RW = gpio__construct_as_output(GPIO__PORT_2, 1); // RW
+  gpio__construct_with_function(GPIO__PORT_2, 1, GPIO__FUNCITON_0_IO_PIN);
 
   gpio__construct_with_function(GPIO__PORT_1, 1, GPIO__FUNCITON_0_IO_PIN);
   LCD_D0 = gpio__construct_as_output(GPIO__PORT_1, 1); // D0
@@ -42,6 +42,7 @@ void lcd_pin_init() {
 }
 
 void lcd_init() {
+
   lcd_pin_init();
 
   delay__ms(16);
@@ -54,7 +55,7 @@ void lcd_init() {
 
   write_to_instruction_register(0x30);
 
-  delay__us(110);
+  delay__us(160);
 
   // pulse_E();
   write_to_instruction_register(0x30);
@@ -122,13 +123,7 @@ void send_8bit_data_mode(unsigned short int data) {
   HD44780_SetUpper(data);
   HD44780_SetLower(data);
 
-  gpio__set(LCD_EN);
-
-  delay__ms(5);
-
-  gpio__reset(LCD_EN);
-
-  delay__ms(5);
+  pulse_E();
 }
 
 void write_to_data_register(unsigned short int data) {
@@ -170,6 +165,7 @@ void lcd_set_cursor(int row, int col) {
 }
 
 void pulse_E() {
+  delay__us(1);
   gpio__set(LCD_EN);
   delay__us(1);
   gpio__reset(LCD_EN);
@@ -189,11 +185,9 @@ void check_busy_flag() {
     uint32_t input = LPC_GPIO1->PIN;
     gpio__reset(LCD_EN);
 
-    if (input & (1 << 29)) { // D7
+    if (!(input & (1 << 29))) { // D7
       break;
     }
-
-    // printf("busy flag\n");
   }
 
   gpio__reset(LCD_RW);

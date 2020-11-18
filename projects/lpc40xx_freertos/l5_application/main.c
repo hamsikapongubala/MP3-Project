@@ -102,6 +102,7 @@ int main(void) {
   // mp3_decoder_setup();
   printf("Hello?\n");
   lcd_init();
+  LCD_display_clear();
   LCD_print_string("HELLO");
 
   setvbuf(stdout, 0, _IONBF, 0);
