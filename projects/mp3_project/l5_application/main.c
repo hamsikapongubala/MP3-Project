@@ -99,7 +99,8 @@ app_cli_status_e cli__mp3_play(app_cli__argument_t argument,
 }
 
 int main(void) {
-  mp3_decoder_setup();
+  // mp3_decoder_setup();
+  printf("Hello?\n");
   lcd_init();
   LCD_print_char("H");
 
@@ -109,13 +110,12 @@ int main(void) {
   song_name_q = xQueueCreate(1, sizeof(song_data_t));
 
   // xTaskCreate(CLI_simulator, "CLI", 1024, NULL, PRIORITY_MEDIUM, NULL);
-  xTaskCreate(mp3_file_reader_task, "reader", 2048 / sizeof(void *), NULL,
-              PRIORITY_MEDIUM, NULL);
-  xTaskCreate(play_file_task, "player", 8192, NULL, PRIORITY_HIGH, NULL);
-  sj2_cli__init();
+  // xTaskCreate(mp3_file_reader_task, "reader", 2048 / sizeof(void *),
+  // NULL,PRIORITY_MEDIUM, NULL); xTaskCreate(play_file_task, "player", 8192,
+  // NULL, PRIORITY_HIGH, NULL); sj2_cli__init();
   puts("Starting RTOS");
-  vTaskStartScheduler(); // This function never returns unless RTOS scheduler
-                         // runs out of memory and fails
+  vTaskStartScheduler(); // This function never returns unless RTOS
+                         // scheduler runs out of memory and fails
 
   return 0;
 }
