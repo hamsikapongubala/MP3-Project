@@ -5,16 +5,20 @@
 #include "cli_handlers.h"
 #include "common_macros.h"
 #include "ff.h"
+#include "gpio.h"
+#include "gpio_isr.h"
 #include "lcd.h"
+#include "lpc_peripherals.h"
 #include "mp3_decoder.h"
-#include "periodic_scheduler.h"
 #include "queue.h"
 #include "sj2_cli.h"
 #include "task.h"
-#include "uart.h"
 
 QueueHandle_t song_name_q;
 static QueueHandle_t mp3_data_q;
+
+SemaphoreHandle_t play_pause;
+bool play = true;
 
 typedef char song_data_t[128];
 typedef char song_name_t[32];
@@ -98,8 +102,42 @@ app_cli_status_e cli__mp3_play(app_cli__argument_t argument,
   return APP_CLI_STATUS__SUCCESS;
 }
 
+void play_pause_ISR() {
+  fprintf(stderr, "play_pause_ISR\n");
+  xSemaphoreGiveFromISR(play_pause, NULL);
+  LPC_GPIOINT->IO0IntClr |= (1 << 30);
+}
+
+void play_pause_button_task() {
+  while (1) {
+    if (xSemaphoreTake(play_pause, portMAX_DELAY)) {
+      if (play) {
+        vTaskResume(play_file_task);
+        fprintf(stderr, "play song");
+        play = false;
+      } else {
+        vTaskSuspend(play_file_task);
+        fprintf(stderr, "pause song");
+        play = true;
+      }
+    }
+    vTaskDelay(100);
+  }
+}
+
+void button_init() {
+  LPC_GPIO0->DIR &= ~(1U << 30);
+  gpio0__attach_interrupt(30, GPIO_INTR__FALLING_EDGE, play_pause_ISR);
+  NVIC_EnableIRQ(GPIO_IRQn);
+  lpc_peripheral__enable_interrupt(LPC_PERIPHERAL__GPIO,
+                                   gpio0__interrupt_dispatcher, "SW2");
+}
+
 int main(void) {
-  // mp3_decoder_setup();
+  lcd_set_cursor(0, 0);
+  play_pause = xSemaphoreCreateBinary();
+  button_init();
+  mp3_decoder_setup();
   printf("Hello?\n");
   lcd_init();
   LCD_display_clear();
@@ -110,10 +148,13 @@ int main(void) {
   mp3_data_q = xQueueCreate(2, sizeof(song_data_t));
   song_name_q = xQueueCreate(1, sizeof(song_data_t));
 
-  // xTaskCreate(CLI_simulator, "CLI", 1024, NULL, PRIORITY_MEDIUM, NULL);
-  // xTaskCreate(mp3_file_reader_task, "reader", 2048 / sizeof(void *),
-  // NULL,PRIORITY_MEDIUM, NULL); xTaskCreate(play_file_task, "player", 8192,
-  // NULL, PRIORITY_HIGH, NULL); sj2_cli__init();
+  xTaskCreate(mp3_file_reader_task, "reader", 2048 / sizeof(void *), NULL,
+              PRIORITY_MEDIUM, NULL);
+  xTaskCreate(play_file_task, "player", 8192, NULL, PRIORITY_HIGH, NULL);
+  sj2_cli__init();
+  xTaskCreate(play_pause_button_task, "play_pause", 2048 / sizeof(void *), NULL,
+              PRIORITY_MEDIUM, NULL);
+
   puts("Starting RTOS");
   vTaskStartScheduler(); // This function never returns unless RTOS
                          // scheduler runs out of memory and fails
