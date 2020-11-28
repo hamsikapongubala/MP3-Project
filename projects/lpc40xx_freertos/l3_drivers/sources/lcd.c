@@ -3,6 +3,8 @@
 #include "lpc40xx.h"
 #include "stdio.h"
 
+int ROW;
+
 gpio_s LCD_EN, LCD_RS, LCD_RW, LCD_D0, LCD_D1, LCD_D2, LCD_D3, LCD_D4, LCD_D5,
     LCD_D6, LCD_D7;
 
@@ -10,17 +12,17 @@ void lcd_pin_init() {
   LCD_EN = gpio__construct_as_output(GPIO__PORT_0, 6); // E
   gpio__construct_with_function(GPIO__PORT_0, 6, GPIO__FUNCITON_0_IO_PIN);
 
-  LCD_RS = gpio__construct_as_output(GPIO__PORT_1, 4); // RS
-  gpio__construct_with_function(GPIO__PORT_1, 4, GPIO__FUNCITON_0_IO_PIN);
+  LCD_RS = gpio__construct_as_output(GPIO__PORT_1, 14); // RS
+  gpio__construct_with_function(GPIO__PORT_1, 14, GPIO__FUNCITON_0_IO_PIN);
 
   LCD_RW = gpio__construct_as_output(GPIO__PORT_2, 1); // RW
   gpio__construct_with_function(GPIO__PORT_2, 1, GPIO__FUNCITON_0_IO_PIN);
 
-  gpio__construct_with_function(GPIO__PORT_1, 1, GPIO__FUNCITON_0_IO_PIN);
-  LCD_D0 = gpio__construct_as_output(GPIO__PORT_1, 1); // D0
+  gpio__construct_with_function(GPIO__PORT_0, 7, GPIO__FUNCITON_0_IO_PIN);
+  LCD_D0 = gpio__construct_as_output(GPIO__PORT_0, 7); // D0
 
-  gpio__construct_with_function(GPIO__PORT_1, 0, GPIO__FUNCITON_0_IO_PIN);
-  LCD_D1 = gpio__construct_as_output(GPIO__PORT_1, 0); // D1
+  gpio__construct_with_function(GPIO__PORT_0, 9, GPIO__FUNCITON_0_IO_PIN);
+  LCD_D1 = gpio__construct_as_output(GPIO__PORT_0, 9); // D1
 
   gpio__construct_with_function(GPIO__PORT_2, 2, GPIO__FUNCITON_0_IO_PIN);
   LCD_D2 = gpio__construct_as_output(GPIO__PORT_2, 2); // D2
@@ -71,10 +73,11 @@ void lcd_init() {
 
   write_to_instruction_register(0x0C);
 
-  write_to_data_register(0x48);
-  write_to_data_register(0x49);
+  LCD_display_clear();
+  lcd_cursor_on();
+  lcd_playlist(0, 0);
 
-  // printf("INIT LCD\n");
+  printf("INIT LCD\n");
 }
 
 void HD44780_SetUpper(unsigned short int data) {
@@ -159,10 +162,15 @@ void LCD_print_string(char *s) {
   }
 }
 
-void lcd_set_cursor(int row, int col) {
+void lcd_playlist(int row, int col) {
   uint8_t position = (col + (row * 40)) + 0x80;
-  write_to_data_register(position);
+  write_to_instruction_register(position);
+  ROW = row;
 }
+
+int get_row() { return ROW; }
+
+void lcd_cursor_on() { write_to_instruction_register(0x0F); }
 
 void pulse_E() {
   delay__us(1);
