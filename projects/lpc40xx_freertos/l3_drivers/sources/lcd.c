@@ -18,11 +18,11 @@ void lcd_pin_init() {
   LCD_RW = gpio__construct_as_output(GPIO__PORT_2, 1); // RW
   gpio__construct_with_function(GPIO__PORT_2, 1, GPIO__FUNCITON_0_IO_PIN);
 
-  gpio__construct_with_function(GPIO__PORT_0, 7, GPIO__FUNCITON_0_IO_PIN);
-  LCD_D0 = gpio__construct_as_output(GPIO__PORT_0, 7); // D0
+  gpio__construct_with_function(GPIO__PORT_4, 28, GPIO__FUNCITON_0_IO_PIN);
+  LCD_D0 = gpio__construct_as_output(GPIO__PORT_4, 28); // D0
 
-  gpio__construct_with_function(GPIO__PORT_0, 9, GPIO__FUNCITON_0_IO_PIN);
-  LCD_D1 = gpio__construct_as_output(GPIO__PORT_0, 9); // D1
+  gpio__construct_with_function(GPIO__PORT_4, 29, GPIO__FUNCITON_0_IO_PIN);
+  LCD_D1 = gpio__construct_as_output(GPIO__PORT_4, 29); // D1
 
   gpio__construct_with_function(GPIO__PORT_2, 2, GPIO__FUNCITON_0_IO_PIN);
   LCD_D2 = gpio__construct_as_output(GPIO__PORT_2, 2); // D2
@@ -76,6 +76,7 @@ void lcd_init() {
   LCD_display_clear();
   lcd_cursor_on();
   lcd_playlist(0, 0);
+  // lcd_cursor_blink();
 
   printf("INIT LCD\n");
 }
