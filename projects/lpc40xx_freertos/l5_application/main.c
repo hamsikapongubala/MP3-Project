@@ -27,14 +27,17 @@ volatile bool pause = false;
 volatile bool next = false;
 volatile bool previous = false;
 
-gpio_s sel, vol_up, vol_down, prev, next_gpio;
+bool playlist = false;
+bool main_menu = true;
+bool volume_menu = false;
+bool settings_menu = false;
+bool trebble_bass_menu = false;
+bool now_playing_menu = false;
+
+gpio_s sel, vol_up, vol_down, prev, next_gpio, back;
 
 typedef char song_data_t[128];
 typedef char song_name_t[32];
-
-uint8_t max_volume = 0x00;
-uint8_t min_volume = 0xFF;
-uint8_t current_volume = 0x24;
 
 void open_mp3_file(char *file_name) {
   song_data_t buffer = {};
@@ -47,7 +50,7 @@ void open_mp3_file(char *file_name) {
     f_read(&file, buffer, sizeof(buffer), &bytes_written);
     while (bytes_written != 0) {
       if (pause) {
-        ;
+        LCD_print_string("Now Playing: ");
       } else {
         f_read(&file, buffer, sizeof(buffer), &bytes_written);
         xQueueSend(mp3_data_q, buffer, portMAX_DELAY);
@@ -96,7 +99,6 @@ void play_file_task() {
 }
 
 void play_pause_ISR() {
-
   if (pause) {
     fprintf(stderr, "pause set to false\n");
     pause = false;
@@ -105,14 +107,37 @@ void play_pause_ISR() {
     fprintf(stderr, "pause set to true\n");
   }
 }
+uint8_t max_volume = 0x00;
+uint8_t min_volume = 0xFF;
+uint16_t current_volume = 0x20;
+
+void volume_up() {
+  if (current_volume <= max_volume) {
+    fprintf(stderr, "Volume at highest\n");
+  } else {
+    current_volume = current_volume - 0x10;
+    write_register(0x0B, current_volume, current_volume);
+    fprintf(stderr, "Increasing volume.\n");
+  }
+}
+void volume_down() {
+  if (current_volume >= min_volume) {
+    fprintf(stderr, "Volume at lowest\n");
+  } else {
+    current_volume = current_volume + 0x10;
+    write_register(0x0B, current_volume, current_volume);
+    fprintf(stderr, "Lowering volume.\n");
+  }
+}
 
 void cursor_isr() {
-  if (get_row() == 1) {
-    lcd_playlist(0, 0);
-    fprintf(stderr, "cursor");
+  int col = get_col();
+  int row = get_row();
+  if (row == 1) {
+    lcd_playlist(0, col);
   } else {
-    lcd_playlist(1, 0);
-    fprintf(stderr, "cursor1");
+    lcd_playlist(1, col);
+    fprintf(stderr, "Col: %d", col);
   }
 }
 
@@ -125,48 +150,127 @@ void build_menu() {
     LCD_print_string(" ");
   }
 }
+void build_main_menu() {
+  LCD_display_clear();
+  lcd_playlist(0, 0);
+  LCD_print_string("playlist");
+  lcd_playlist(1, 0);
+  LCD_print_string("settings");
+}
+void build_song_menu() {
+  LCD_display_clear();
+  lcd_playlist(0, 0);
+  LCD_print_string("song.mp3");
+  lcd_playlist(1, 0);
+  LCD_print_string("music.mp3");
+}
+
+void build_setting_menu() {
+  LCD_display_clear();
+  lcd_playlist(0, 0);
+  LCD_print_string("Volume");
+  lcd_playlist(1, 0);
+  LCD_print_string("Treble and Bass");
+}
+void build_vol_menu() {
+  int vol = current_volume;
+  char c = vol + '0'; // not working??
+  LCD_display_clear();
+  lcd_playlist(0, 0);
+  LCD_print_string("Volume :");
+  LCD_print_char(c);
+}
+void build_trebble_bass_menu() {
+  LCD_display_clear();
+  lcd_playlist(0, 0);
+  LCD_print_string("Treble: 6");
+  lcd_playlist(1, 1);
+  LCD_print_string("Bass: 6");
+}
 
 void select() {
-  if (song_list__get_item_count() > 0) {
-    int row = get_row();
-    current_playing = row;
-    char *s = song_list__get_name_for_item(row);
-
-    fprintf(stderr, "Sent song %i.\n", row);
-    xQueueSendFromISR(song_name_q, s, 0);
-
-    LCD_display_clear();
-    LCD_print_string("Now Playing:");
-    lcd_playlist(1, 0);
-    LCD_print_string(s);
-  } else {
-    ; // no mp3 files
+  if (main_menu) {
+    if (get_row() == 0) {
+      playlist = true;
+      build_song_menu();
+      // build_menu();
+      main_menu = false;
+    } else {
+      build_setting_menu();
+      settings_menu = true;
+      main_menu = false;
+    }
+  } else if (playlist) {
+    if (song_list__get_item_count() > 0) {
+      int row = get_row();
+      char *s = song_list__get_name_for_item(row);
+      now_playing_menu = true;
+      LCD_display_clear();
+      LCD_print_string("Now Playing: ");
+      LCD_print_string(s);
+      lcd_playlist(1, 1);
+      LCD_print_string("Artist: ");
+      xQueueSendFromISR(song_name_q, s, 0);
+    }
+  } else if (settings_menu) {
+    if (get_row() == 0) {
+      settings_menu = false;
+      volume_menu = true;
+      build_vol_menu();
+    } else {
+      settings_menu = false;
+      trebble_bass_menu = true;
+      build_trebble_bass_menu();
+    }
   }
 }
 void select_isr(void) {
   select();
   fprintf(stderr, "select isr\n");
 }
-
-void volume_up() {
-
-  if (current_volume <= max_volume) {
-    fprintf(stderr, "Volume at highest\n");
-
+void up_isr() {
+  if (volume_menu) {
+    build_vol_menu();
+    volume_up();
+  } else if (trebble_bass_menu) {
+    build_trebble_bass_menu();
   } else {
-    current_volume = current_volume - 0x10;
-    write_register(0x0B, current_volume, current_volume);
-    fprintf(stderr, "Increasing volume.\n");
+    volume_up();
   }
 }
-void volume_down() {
-  if (current_volume == min_volume) {
-    fprintf(stderr, "Volume at lowest\n");
 
+void down_isr() {
+  if (volume_menu) {
+    build_vol_menu();
+    volume_down();
+  } else if (trebble_bass_menu) {
+    build_trebble_bass_menu();
   } else {
-    current_volume = current_volume + 0x10;
-    write_register(0x0B, current_volume, current_volume);
-    fprintf(stderr, "Lowering volume.\n");
+    volume_down();
+  }
+}
+
+void back_isr() {
+  if (volume_menu) {
+    volume_menu = false;
+    settings_menu = true;
+    build_setting_menu();
+  } else if (trebble_bass_menu) {
+    trebble_bass_menu = false;
+    settings_menu = true;
+    build_setting_menu();
+  } else if (settings_menu) {
+    settings_menu = false;
+    main_menu = true;
+    build_main_menu();
+  } else if (now_playing_menu) {
+    now_playing_menu = false;
+    playlist = true;
+    build_song_menu();
+  } else if (playlist) {
+    playlist = false;
+    main_menu = true;
+    build_main_menu();
   }
 }
 
@@ -186,7 +290,7 @@ void next_song_isr(void) {
     char *s = song_list__get_name_for_item(current_playing + 1);
     fprintf(stderr, "next song isr\n");
     next = true;
-    xQueueSendFromISR(song_name_q, s, 0);
+    // xQueueSendFromISR(song_name_q, s, 0);
   }
 }
 
@@ -203,19 +307,23 @@ void button_init() {
 
   vol_up = gpio__construct_with_function(GPIO__PORT_0, 26, 0);
   LPC_GPIO0->DIR &= ~(1U << 26);
-  gpio0__attach_interrupt(26, GPIO_INTR__FALLING_EDGE, volume_down);
+  gpio0__attach_interrupt(26, GPIO_INTR__FALLING_EDGE, prev_song_isr);
 
   vol_down = gpio__construct_with_function(GPIO__PORT_0, 0, 0);
   LPC_GPIO0->DIR &= ~(1U << 0);
-  gpio0__attach_interrupt(0, GPIO_INTR__FALLING_EDGE, volume_up);
+  gpio0__attach_interrupt(0, GPIO_INTR__FALLING_EDGE, next_song_isr);
 
-  prev = gpio__construct_with_function(GPIO__PORT_0, 10, 0);
+  prev = gpio__construct_with_function(GPIO__PORT_0, 1, 0);
   gpio__set_as_input(prev);
-  gpio0__attach_interrupt(10, GPIO_INTR__FALLING_EDGE, prev_song_isr);
+  gpio0__attach_interrupt(1, GPIO_INTR__FALLING_EDGE, up_isr);
 
-  next_gpio = gpio__construct_with_function(GPIO__PORT_0, 11, 0);
+  next_gpio = gpio__construct_with_function(GPIO__PORT_0, 22, 0);
   gpio__set_as_input(next_gpio);
-  gpio0__attach_interrupt(11, GPIO_INTR__FALLING_EDGE, next_song_isr);
+  gpio0__attach_interrupt(22, GPIO_INTR__FALLING_EDGE, down_isr);
+
+  back = gpio__construct_with_function(GPIO__PORT_0, 11, 0);
+  gpio__set_as_input(next_gpio);
+  gpio0__attach_interrupt(11, GPIO_INTR__FALLING_EDGE, back_isr);
 
   lpc_peripheral__enable_interrupt(LPC_PERIPHERAL__GPIO,
                                    gpio0__interrupt_dispatcher, NULL);
@@ -246,8 +354,7 @@ int main(void) {
 
   lcd_init();
   LCD_display_clear();
-
-  build_menu();
+  build_main_menu();
 
   vTaskStartScheduler();
 

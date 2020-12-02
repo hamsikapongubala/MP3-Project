@@ -3,7 +3,7 @@
 #include "lpc40xx.h"
 #include "stdio.h"
 
-int ROW;
+int ROW, COL;
 
 gpio_s LCD_EN, LCD_RS, LCD_RW, LCD_D0, LCD_D1, LCD_D2, LCD_D3, LCD_D4, LCD_D5,
     LCD_D6, LCD_D7;
@@ -161,15 +161,18 @@ void LCD_print_string(char *s) {
   for (int i = 0; i < len; i++) {
     LCD_print_char(s[i]);
   }
+  COL = len;
 }
 
 void lcd_playlist(int row, int col) {
   uint8_t position = (col + (row * 40)) + 0x80;
   write_to_instruction_register(position);
   ROW = row;
+  COL = col;
 }
 
 int get_row() { return ROW; }
+int get_col() { return COL; }
 
 void lcd_cursor_on() { write_to_instruction_register(0x0F); }
 
@@ -208,3 +211,11 @@ void LCD_display_clear(void) {
   // Diplay clear
   write_to_instruction_register(0x01);
 }
+void lcd_display_shift_left() {
+  // fprintf(stderr, "shift");
+  write_to_instruction_register(0x18);
+}
+
+void lcd_cursor_shift_left() { write_to_instruction_register(0x10); }
+
+void lcd_cursor_shift_right() { write_to_instruction_register(0x14); }
