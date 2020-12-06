@@ -216,6 +216,12 @@ void lcd_display_shift_left() {
   write_to_instruction_register(0x18);
 }
 
-void lcd_cursor_shift_left() { write_to_instruction_register(0x10); }
+void lcd_display_shift_right() { write_to_instruction_register(0x1C); }
 
-void lcd_cursor_shift_right() { write_to_instruction_register(0x14); }
+void lcd_cursor_shift_left() {
+  write_to_instruction_register(0x10);
+}
+
+void lcd_cursor_shift_right() {
+  write_to_instruction_register(0x14);
+}
