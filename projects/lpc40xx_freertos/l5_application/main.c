@@ -39,10 +39,9 @@ int page = 0;
 
 int volume_count = 3;
 int bass_count = 3;
-int treble_count = 7;
+int treble_count = 5;
 
-gpio_s sel, vol_up, vol_down, prev, next_gpio, back, down_bass, down_treble,
-    up_bass, up_treble;
+gpio_s sel, vol_up, vol_down, prev, next_gpio, back, down_bass, down_treble, up_bass, up_treble, song_page;
 
 typedef char song_data_t[128];
 typedef char song_name_t[32];
@@ -110,11 +109,9 @@ void print_song_info(char *song_info) {
   int count_name = 0;
   int count_artist = 0;
   for (int i = 0; i < 128; i++) {
-    if ((((int)(song_info[i]) > 47) && ((int)(song_info[i]) < 58)) || // number
-        (((int)(song_info[i]) > 64) &&
-         ((int)(song_info[i]) < 91)) || // ALPHABET
-        (((int)(song_info[i]) > 96) &&
-         ((int)(song_info[i]) < 123)) || // alphabet
+    if ((((int)(song_info[i]) > 47) && ((int)(song_info[i]) < 58)) ||  // number
+        (((int)(song_info[i]) > 64) && ((int)(song_info[i]) < 91)) ||  // ALPHABET
+        (((int)(song_info[i]) > 96) && ((int)(song_info[i]) < 123)) || // alphabet
         ((int)(song_info[i])) == 32) {
 
       if (i > 2 && i < 33) {
@@ -463,28 +460,30 @@ void next_song_isr(void) {
 
 void button_init() {
   LPC_GPIO0->DIR &= ~(1U << 30);
-  gpio0__attach_interrupt(30, GPIO_INTR__FALLING_EDGE, cursor_isr);
+  gpio0__attach_interrupt(30, GPIO_INTR__FALLING_EDGE, cursor_isr); // cursor_isr
 
   LPC_GPIO0->DIR &= ~(1U << 29);
   gpio0__attach_interrupt(29, GPIO_INTR__FALLING_EDGE, play_pause_ISR);
 
   sel = gpio__construct_with_function(GPIO__PORT_0, 25, 0);
   gpio__set_as_input(sel);
-  gpio0__attach_interrupt(25, GPIO_INTR__FALLING_EDGE, select_isr);
+  gpio0__attach_interrupt(25, GPIO_INTR__FALLING_EDGE, select_isr); // select_isr
 
   vol_up = gpio__construct_with_function(GPIO__PORT_0, 26, 0);
   LPC_GPIO0->DIR &= ~(1U << 26);
-  gpio0__attach_interrupt(26, GPIO_INTR__FALLING_EDGE,
-                          prev_song_isr); // prev_song_isr
+  gpio0__attach_interrupt(26, GPIO_INTR__FALLING_EDGE, prev_song_isr); // prev_song_isr
 
   vol_down = gpio__construct_with_function(GPIO__PORT_0, 0, 0);
   LPC_GPIO0->DIR &= ~(1U << 0);
-  gpio0__attach_interrupt(0, GPIO_INTR__FALLING_EDGE,
-                          next_song_isr); // next_song_isr
+  gpio0__attach_interrupt(0, GPIO_INTR__FALLING_EDGE, next_song_isr); // next_song_isr
+
+  song_page = gpio__construct_with_function(GPIO__PORT_0, 10, 10);
+  gpio__set_as_input(song_page);
+  gpio0__attach_interrupt(10, GPIO_INTR__FALLING_EDGE, new_song_page);
 
   prev = gpio__construct_with_function(GPIO__PORT_0, 1, 0);
   gpio__set_as_input(prev);
-  gpio0__attach_interrupt(1, GPIO_INTR__FALLING_EDGE, new_song_page); // up_isr
+  gpio0__attach_interrupt(1, GPIO_INTR__FALLING_EDGE, up_isr); // up_isr
 
   next_gpio = gpio__construct_with_function(GPIO__PORT_0, 22, 0);
   gpio__set_as_input(next_gpio);
@@ -494,8 +493,7 @@ void button_init() {
   gpio__set_as_input(next_gpio);
   gpio0__attach_interrupt(11, GPIO_INTR__FALLING_EDGE, back_isr);
 
-  lpc_peripheral__enable_interrupt(LPC_PERIPHERAL__GPIO,
-                                   gpio0__interrupt_dispatcher, NULL);
+  lpc_peripheral__enable_interrupt(LPC_PERIPHERAL__GPIO, gpio0__interrupt_dispatcher, NULL);
   // NVIC_EnableIRQ(GPIO_IRQn);
 }
 
@@ -509,16 +507,13 @@ int main(void) {
   song_name_q = xQueueCreate(1, sizeof(song_data_t));
   select_sem = xSemaphoreCreateBinary();
 
-  xTaskCreate(mp3_file_reader_task, "reader", 2048 / sizeof(void *), NULL,
-              PRIORITY_HIGH, &reader_handle);
+  xTaskCreate(mp3_file_reader_task, "reader", 2048 / sizeof(void *), NULL, PRIORITY_HIGH, &reader_handle);
   xTaskCreate(play_file_task, "player", 8192, NULL, PRIORITY_MEDIUM, NULL);
   sj2_cli__init();
 
   song_list__populate();
-  for (size_t song_number = 0; song_number < song_list__get_item_count();
-       song_number++) {
-    printf("Song %2d: %s\n", (1 + song_number),
-           song_list__get_name_for_item(song_number));
+  for (size_t song_number = 0; song_number < song_list__get_item_count(); song_number++) {
+    printf("Song %2d: %s\n", (1 + song_number), song_list__get_name_for_item(song_number));
   }
 
   lcd_init();
@@ -530,8 +525,7 @@ int main(void) {
   return 0;
 }
 
-app_cli_status_e cli__mp3_play(app_cli__argument_t argument,
-                               sl_string_t user_input_minus_command_name,
+app_cli_status_e cli__mp3_play(app_cli__argument_t argument, sl_string_t user_input_minus_command_name,
                                app_cli__print_string_function cli_output) {
 
   sl_string_t s = user_input_minus_command_name;
